@@ -71,7 +71,7 @@ public class TrackingSS {
     public static double getTurretPos() {
         setDxAndDy();
 
-        double targetHeading = Math.atan2(dy, dx);
+        double targetHeading = Math.atan2(dy, dx); // arctan function using perpendicular and base to find theta :)
         double robotHeading = follower.pose().heading();
 
         double turretTarget = angleWrap(targetHeading - robotHeading);

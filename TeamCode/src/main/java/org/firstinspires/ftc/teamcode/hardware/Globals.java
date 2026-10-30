@@ -6,7 +6,7 @@ import com.pedropathing.math.Pose;
 @Configurable
 public class Globals {
     public static double intakeOn = 1;
-    public static double intakeOff = 1;
+    public static double intakeOff = 0;
     public static double intakeRev = -1;
     public static double shooterOn = 1000; //todo tune
     public static double shooterInit = 0;
