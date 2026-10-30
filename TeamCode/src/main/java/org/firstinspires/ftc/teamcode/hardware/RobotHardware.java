@@ -1,12 +1,24 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+@Configurable
 public class RobotHardware {
-    public Servo servo1;
-    public Servo servo2;
-
+    public DcMotorEx intake1;
+    public DcMotorEx intake2;
+    public DcMotorEx shooter1;
+    public DcMotorEx shooter2;
+    public ServoImplEx turret;
+    public ServoImplEx hood;
+    public static double P = 0;
+    public static double I = 0;
+    public static double D = 0;
+    public static double F = 0;
+    // todo beambreakers
     public static boolean enabled = false;
     public static RobotHardware instance;
     public static RobotHardware getInstance() {
@@ -17,7 +29,20 @@ public class RobotHardware {
         return instance;
     }
     public void init(HardwareMap hardwareMap) {
-        servo1 = hardwareMap.get(Servo.class, "servo1");
-        servo2 = hardwareMap.get(Servo.class, "servo2");
+       intake1 = hardwareMap.get(DcMotorEx.class, "intake1");
+       intake2 = hardwareMap.get(DcMotorEx.class, "intake2");
+
+       intake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       intake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+       shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+       shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+
+       shooter1.setVelocityPIDFCoefficients(P, I, D, F);
+       shooter2.setVelocityPIDFCoefficients(P, I, D, F);
+
+       turret = hardwareMap.get(ServoImplEx.class, "turret");
+       hood = hardwareMap.get(ServoImplEx.class, "hood");
+       //todo beambreakers
     }
 }
