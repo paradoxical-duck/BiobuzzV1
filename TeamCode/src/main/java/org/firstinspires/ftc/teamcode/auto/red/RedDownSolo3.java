@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto.red;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 
@@ -7,16 +7,17 @@ import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.auto.paths.RedDownSolo3Path;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @Autonomous
-public class SAuto1 extends LinearOpMode {
+public class RedDownSolo3 extends LinearOpMode {
     Follower follower;
-    SAutoPath1 path;
+    RedDownSolo3Path path;
     boolean scheduled = false;
     @Override
     public void runOpMode() throws InterruptedException {
-        path = new SAutoPath1();
+        path = new RedDownSolo3Path();
         follower = Constants.create(hardwareMap);
         follower.setPose(path.startPose);
 
