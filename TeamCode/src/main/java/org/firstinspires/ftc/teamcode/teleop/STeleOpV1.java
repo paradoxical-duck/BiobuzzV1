@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 @TeleOp(name = "Para Tele V1 💛", group = "AAAAAAAAAAAAAAA")
 @Configurable
 public class STeleOpV1 extends LinearOpMode {
-    IntakeSS in;
+    IntakeSS intakeSS;
     ShooterSS shooterSS;
     TrackingSS trackingSS;
     Follower follower;
@@ -44,7 +44,7 @@ public class STeleOpV1 extends LinearOpMode {
         robot.init(hardwareMap);
 
         //***subsystems***
-        in = new IntakeSS(robot);
+        intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 
         follower = Constants.create(hardwareMap);
@@ -53,7 +53,7 @@ public class STeleOpV1 extends LinearOpMode {
         shooterSS.updateState(ShooterSS.ShooterState.INIT);
         shooterSS.updateState(ShooterSS.HoodState.INIT);
         shooterSS.updateState(ShooterSS.TurretState.INIT);
-        in.updateState(IntakeSS.IntakeState.INIT);
+        intakeSS.updateState(IntakeSS.IntakeState.INIT);
 
         while (opModeInInit()) {
             if (gamepad1.left_bumper && !lastLB) {
@@ -134,10 +134,10 @@ public class STeleOpV1 extends LinearOpMode {
                 intakeReversed = false;
 
                 if (intakeEnabled) {
-                    in.updateState(IntakeSS.IntakeState.ON);
+                    intakeSS.updateState(IntakeSS.IntakeState.ON);
                 }
                 else {
-                    in.updateState(IntakeSS.IntakeState.INIT);
+                    intakeSS.updateState(IntakeSS.IntakeState.INIT);
                 }
             }
             lastRB = gamepad1.right_bumper;
@@ -147,10 +147,10 @@ public class STeleOpV1 extends LinearOpMode {
                 intakeEnabled = intakeReversed;
 
                 if (intakeReversed) {
-                    in.updateState(IntakeSS.IntakeState.REVERSE);
+                    intakeSS.updateState(IntakeSS.IntakeState.REVERSE);
                 }
                 else {
-                    in.updateState(IntakeSS.IntakeState.INIT);
+                    intakeSS.updateState(IntakeSS.IntakeState.INIT);
                 }
             }
             lastX = gamepad1.x;
@@ -163,7 +163,7 @@ public class STeleOpV1 extends LinearOpMode {
             telemetry.addData("Alliance", Side.getAlliance());
             telemetry.addData("Tracking", trackingEnabled);
             telemetry.addData("Shooter", shooterEnabled);
-            telemetry.addData("Intake", in.getState());
+            telemetry.addData("Intake", intakeSS.getState());
 
             if (printData) {
                 telemetry.addLine("");

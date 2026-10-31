@@ -32,4 +32,16 @@ public class Globals {
     public static double flowerRampDeployed = 0.5;
     public static double flowerRampInit = 0.5;
     //todo TUNE^^^^^^^^^^
+
+    //todo shooter lock poses
+    public static double locked = 0.5;
+    public static double unlocked = 0.5;
+    //todo tune
+    public static double shootDelayMs = 500; //todo figure out actual delay
+    public static double shootRevDelayMs = 250; //todo figure out
+    //todo auto shooter values todo tune
+    public static double autoShoot = 1000;
+    public static double autoTurret = 0.5;
+    public static double autoHood = 0.5;
+
 }

@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.auto.red;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
@@ -9,12 +10,19 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.auto.paths.RedDownSolo3Path;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.FlowerRampSS;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 
 @Autonomous
+//todo before auto: GET VALUES FOR AUTO SHOOT TURRET AND HOOD
 public class RedDownSolo3 extends LinearOpMode {
     Follower follower;
     RedDownSolo3Path path;
     boolean scheduled = false;
+    IntakeSS intakeSS;
+    FlowerRampSS flowerRampSS;
+    ShooterSS shooterSS;
     @Override
     public void runOpMode() throws InterruptedException {
         path = new RedDownSolo3Path();
@@ -29,7 +37,7 @@ public class RedDownSolo3 extends LinearOpMode {
         while (opModeIsActive()) {
             follower.update();
             if (!scheduled) {
-                schedule(path.autoRoutine(follower));
+                schedule(path.autoRoutine(follower, intakeSS, flowerRampSS, shooterSS));
             }
             scheduled = true;
 

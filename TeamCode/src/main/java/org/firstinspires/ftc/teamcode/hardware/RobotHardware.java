@@ -15,6 +15,7 @@ public class RobotHardware {
     public ServoImplEx turret;
     public ServoImplEx hood;
     public ServoImplEx flowerRamp;
+    public ServoImplEx lock;
     public static double P = 0;
     public static double I = 0;
     public static double D = 0;
@@ -47,6 +48,7 @@ public class RobotHardware {
        hood = hardwareMap.get(ServoImplEx.class, "hood");
 
        flowerRamp = hardwareMap.get(ServoImplEx.class, "flower ramp");
+       lock = hardwareMap.get(ServoImplEx.class, "lock");
        //todo beambreakers
     }
 }

@@ -12,7 +12,7 @@ public class ShooterSS {
     }
 
     //todo******** shooter *********
-    public enum ShooterState {INIT, INTERPOL_DISABLED, INTERPOLATED,}
+    public enum ShooterState {INIT, INTERPOL_DISABLED, INTERPOLATED, AUTO}
     ShooterState shooterState = ShooterState.INTERPOL_DISABLED;
 
     private double shooterTarget = Globals.shooterOn;
@@ -28,6 +28,7 @@ public class ShooterSS {
 
     public void updateState(ShooterState newState) {
         double target = 0;
+
         switch (newState) {
             case INIT:
                 target = Globals.shooterInit;
@@ -38,14 +39,18 @@ public class ShooterSS {
             case INTERPOLATED:
                 target = shooterTarget;
                 break;
+            case AUTO:
+                target = Globals.autoShoot;
+                break;
         }
+
         robot.shooter1.setVelocity(target);
         robot.shooter2.setVelocity(target);
         shooterState = newState;
     }
 
     //todo******** turret *********
-    public enum TurretState {INIT, TRACKING_DISABLED, TRACKING_ENABLED, SHOOT}
+    public enum TurretState {INIT, TRACKING_DISABLED, TRACKING_ENABLED, SHOOT, AUTO}
     TurretState turretState = TurretState.TRACKING_DISABLED;
 
     private double turretTarget = Globals.turretInit;
@@ -59,24 +64,31 @@ public class ShooterSS {
     }
 
     public void updateState(TurretState newState) {
-        turretState = newState;
+        double target = robot.turret.getPosition();
+
         switch (newState) {
+            case INIT:
+                target = Globals.turretInit;
+                break;
             case TRACKING_DISABLED:
                 break;
-            case INIT:
-                robot.turret.setPosition(Globals.turretInit);
-                break;
             case TRACKING_ENABLED:
-                robot.turret.setPosition(turretTarget);
+                target = turretTarget;
                 break;
             case SHOOT:
-                robot.turret.setPosition(Globals.turretShootPos);
+                target = Globals.turretShootPos;
+                break;
+            case AUTO:
+                target = Globals.autoTurret;
                 break;
         }
+
+        robot.turret.setPosition(target);
+        turretState = newState;
     }
 
     //todo******** hood *********
-    public enum HoodState {INIT, INTERPOL_DISABLED, INTERPOLATED, SHOOT}
+    public enum HoodState {INIT, INTERPOL_DISABLED, INTERPOLATED, SHOOT, AUTO}
     public HoodState hoodState = HoodState.INTERPOL_DISABLED;
 
     private double hoodTarget = Globals.hoodShootPos;
@@ -90,23 +102,47 @@ public class ShooterSS {
     }
 
     public void updateState(HoodState newState) {
-        double target = 0;
+        double target = robot.hood.getPosition();
+
         switch (newState) {
+            case INIT:
+                target = Globals.hoodInit;
+                break;
             case INTERPOL_DISABLED:
-                target = robot.hood.getPosition();
                 break;
             case INTERPOLATED:
                 target = hoodTarget;
                 break;
-            case INIT:
-                target = Globals.hoodInit;
-                break;
             case SHOOT:
                 target = Globals.hoodShootPos;
                 break;
+            case AUTO:
+                target = Globals.autoHood;
+                break;
         }
+
         robot.hood.setPosition(target);
         hoodState = newState;
+    }
+
+    //todo ******************lock*************
+    public enum LockState {UNLOCKED, LOCKED}
+    public LockState lockState = LockState.UNLOCKED;
+
+    public void updateState(LockState newState) {
+        double target = 0;
+
+        switch (newState) {
+            case UNLOCKED:
+                target = Globals.unlocked;
+                break;
+            case LOCKED:
+                target = Globals.locked;
+                break;
+        }
+
+        robot.lock.setPosition(target);
+        lockState = newState;
     }
 
     public ShooterState getShooterState() {
@@ -119,5 +155,9 @@ public class ShooterSS {
 
     public TurretState getTurretState() {
         return turretState;
+    }
+
+    public LockState getLockState() {
+        return lockState;
     }
 }

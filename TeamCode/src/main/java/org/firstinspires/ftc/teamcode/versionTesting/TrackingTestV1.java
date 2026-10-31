@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode.VersionTesting;
+package org.firstinspires.ftc.teamcode.versionTesting;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
