@@ -14,6 +14,7 @@ public class RobotHardware {
     public DcMotorEx shooter2;
     public ServoImplEx turret;
     public ServoImplEx hood;
+    public ServoImplEx flowerRamp;
     public static double P = 0;
     public static double I = 0;
     public static double D = 0;
@@ -42,7 +43,10 @@ public class RobotHardware {
        shooter2.setVelocityPIDFCoefficients(P, I, D, F);
 
        turret = hardwareMap.get(ServoImplEx.class, "turret");
+       //TODO TURRET MAY BE 2 SERVOSSSSSSSSS
        hood = hardwareMap.get(ServoImplEx.class, "hood");
+
+       flowerRamp = hardwareMap.get(ServoImplEx.class, "flower ramp");
        //todo beambreakers
     }
 }

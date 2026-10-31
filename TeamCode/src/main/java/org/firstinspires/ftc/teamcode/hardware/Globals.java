@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 
 @Configurable
@@ -15,13 +16,20 @@ public class Globals {
     public static double hoodInit = 0.5;
     public static double turretShootPos = 0.5;
     //todo poses for odo turret tracking
-    public static Pose redHiveUpSide;
-    public static Pose redHiveDownSide;
-    public static Pose blueHiveUpSide;
-    public static Pose blueHiveDownSide;
+    public static Pose redHiveDownSide = new Pose(57.75, 52.5292);
+    public static Pose redHiveUpSide = new Pose(57.75, 85.5877);
+    public static Pose blueHiveDownSide = new Pose(84.19, 49.6123);
+    public static Pose blueHiveUpSide = new Pose(84.19, 87.1434);
+    public static double turretOffset = 0.0; //TODO MAY BE REQUIRED FOR DOUBBLE TURRET WITH 2 SERVOS
     //todo shooter PIDF
     public static double P = 0;
     public static double I = 0;
     public static double D = 0;
     public static double F = 0;
+
+    //todo flower ramp poses
+    public static double flowerRampUp = 0.5;
+    public static double flowerRampDeployed = 0.5;
+    public static double flowerRampInit = 0.5;
+    //todo TUNE^^^^^^^^^^
 }
