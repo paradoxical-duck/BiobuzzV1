@@ -53,9 +53,7 @@ public class STeleOpV1 extends LinearOpMode {
         shooterSS.updateState(ShooterSS.ShooterState.INIT);
         shooterSS.updateState(ShooterSS.HoodState.INIT);
         shooterSS.updateState(ShooterSS.TurretState.INIT);
-
-        robot.intake1.setPower(0);
-        robot.intake2.setPower(0);
+        in.updateState(IntakeSS.IntakeState.INIT);
 
         while (opModeInInit()) {
             if (gamepad1.left_bumper && !lastLB) {
@@ -63,8 +61,12 @@ public class STeleOpV1 extends LinearOpMode {
             }
             lastLB = gamepad1.left_bumper;
 
-            if (red) Side.setAlliance(Side.ALLIANCE.RED);
-            else Side.setAlliance(Side.ALLIANCE.BLUE);
+            if (red) {
+                Side.setAlliance(Side.ALLIANCE.RED);
+            }
+            else {
+                Side.setAlliance(Side.ALLIANCE.BLUE);
+            }
 
             if (gamepad1.left_trigger > 0.3 && !lastLT) {
                 printData = !printData;
@@ -78,7 +80,9 @@ public class STeleOpV1 extends LinearOpMode {
             telemetry.update();
         }
 
-        if (isStopRequested()) return;
+        if (isStopRequested()) {
+            return;
+        }
 
         trackingSS = new TrackingSS(robot, follower, Side.getAlliance());
 
@@ -93,19 +97,19 @@ public class STeleOpV1 extends LinearOpMode {
 
                 if (trackingEnabled) {
                     TrackingSS.updateTracking(shooterSS);
-
                     shooterSS.updateState(ShooterSS.TurretState.TRACKING_ENABLED);
                     shooterSS.updateState(ShooterSS.HoodState.INTERPOLATED);
-
-                    if (shooterEnabled) shooterSS.updateState(ShooterSS.ShooterState.INTERPOLATED);
                 }
                 else {
                     shooterSS.updateState(ShooterSS.TurretState.TRACKING_DISABLED);
                     shooterSS.updateState(ShooterSS.HoodState.SHOOT);
+                }
 
-                    if (shooterEnabled) {
-                        shooterSS.updateState(ShooterSS.ShooterState.INTERPOL_DISABLED);
-                    }
+                if (shooterEnabled && trackingEnabled) {
+                    shooterSS.updateState(ShooterSS.ShooterState.INTERPOLATED);
+                }
+                else if (shooterEnabled) {
+                    shooterSS.updateState(ShooterSS.ShooterState.INTERPOL_DISABLED);
                 }
             }
             lastStart = gamepad1.start;
@@ -113,12 +117,14 @@ public class STeleOpV1 extends LinearOpMode {
             if (gamepad1.a && !lastA) {
                 shooterEnabled = !shooterEnabled;
 
-                if (shooterEnabled) {
-                    if (trackingEnabled) shooterSS.updateState(ShooterSS.ShooterState.INTERPOLATED);
-                    else shooterSS.updateState(ShooterSS.ShooterState.INTERPOL_DISABLED);
+                if (!shooterEnabled) {
+                    shooterSS.updateState(ShooterSS.ShooterState.INIT);
+                }
+                else if (trackingEnabled) {
+                    shooterSS.updateState(ShooterSS.ShooterState.INTERPOLATED);
                 }
                 else {
-                    shooterSS.updateState(ShooterSS.ShooterState.INIT);
+                    shooterSS.updateState(ShooterSS.ShooterState.INTERPOL_DISABLED);
                 }
             }
             lastA = gamepad1.a;
@@ -145,8 +151,6 @@ public class STeleOpV1 extends LinearOpMode {
                 }
                 else {
                     in.updateState(IntakeSS.IntakeState.INIT);
-                    robot.intake1.setPower(0);
-                    robot.intake2.setPower(0);
                 }
             }
             lastX = gamepad1.x;
@@ -159,7 +163,7 @@ public class STeleOpV1 extends LinearOpMode {
             telemetry.addData("Alliance", Side.getAlliance());
             telemetry.addData("Tracking", trackingEnabled);
             telemetry.addData("Shooter", shooterEnabled);
-            telemetry.addData("Intake", !intakeEnabled ? "OFF" : intakeReversed ? "REVERSE" : "ON");
+            telemetry.addData("Intake", in.getState());
 
             if (printData) {
                 telemetry.addLine("");

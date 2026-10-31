@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
-@TeleOp
+@TeleOp(group = "Version Testing")
 @Configurable
 public class IntakeTestV1 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();

@@ -93,10 +93,6 @@ public class TrackingSS {
         return map(current, turretLeft, turretRight, -42.9, 249.2);
     }
 
-    public static double getTurret(RobotHardware robot) {
-        return robot.turret.getPosition();
-    }
-
     public static double map(double val, double inMin, double inMax, double outMin, double outMax) {
         return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     }

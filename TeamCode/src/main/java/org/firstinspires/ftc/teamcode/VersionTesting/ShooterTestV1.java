@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 @Configurable
-@TeleOp
+@TeleOp(group = "Version Testing")
 public class ShooterTestV1 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
     public static double shooter1Vel = 0;
