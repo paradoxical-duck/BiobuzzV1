@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.auto.paths.RedDownSolo3Path;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.FlowerRampSS;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 
@@ -21,7 +20,6 @@ public class RedDownSolo3 extends LinearOpMode {
     RedDownSolo3Path path;
     boolean scheduled = false;
     IntakeSS intakeSS;
-    FlowerRampSS flowerRampSS;
     ShooterSS shooterSS;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -37,7 +35,7 @@ public class RedDownSolo3 extends LinearOpMode {
         while (opModeIsActive()) {
             follower.update();
             if (!scheduled) {
-                schedule(path.autoRoutine(follower, intakeSS, flowerRampSS, shooterSS));
+                schedule(path.autoRoutine(follower, intakeSS, shooterSS));
             }
             scheduled = true;
 

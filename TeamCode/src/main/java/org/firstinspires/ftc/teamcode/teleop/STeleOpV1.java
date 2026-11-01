@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
-@TeleOp(name = "Para Tele V1 💛", group = "AAAAAAAAAAAAAAA")
+@TeleOp(name = "Para Tele V1 💛")
 @Configurable
 public class STeleOpV1 extends LinearOpMode {
     IntakeSS intakeSS;
@@ -163,7 +163,7 @@ public class STeleOpV1 extends LinearOpMode {
             telemetry.addData("Alliance", Side.getAlliance());
             telemetry.addData("Tracking", trackingEnabled);
             telemetry.addData("Shooter", shooterEnabled);
-            telemetry.addData("Intake", intakeSS.getState());
+            telemetry.addData("Intake", intakeSS.getIntakeState());
 
             if (printData) {
                 telemetry.addLine("");

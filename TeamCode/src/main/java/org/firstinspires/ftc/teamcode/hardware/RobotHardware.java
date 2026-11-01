@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
@@ -21,6 +22,10 @@ public class RobotHardware {
     public static double D = 0;
     public static double F = 0;
     // todo beambreakers
+    public DigitalChannel frontBeam;
+    public DigitalChannel midBeam;
+    public DigitalChannel pollenBeam;
+    public DigitalChannel nectarBeam;
     public static boolean enabled = false;
     public static RobotHardware instance;
     public static RobotHardware getInstance() {
@@ -50,5 +55,9 @@ public class RobotHardware {
        flowerRamp = hardwareMap.get(ServoImplEx.class, "flower ramp");
        lock = hardwareMap.get(ServoImplEx.class, "lock");
        //todo beambreakers
+        pollenBeam = hardwareMap.get(DigitalChannel.class, "pollenBeam");
+        nectarBeam = hardwareMap.get(DigitalChannel.class, "nectarBeam");
+        midBeam = hardwareMap.get(DigitalChannel.class, "midBeam");
+        frontBeam = hardwareMap.get(DigitalChannel.class, "frontBeam");
     }
 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.versionTesting;
+package org.firstinspires.ftc.teamcode.versionTesting.intakeSS;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;

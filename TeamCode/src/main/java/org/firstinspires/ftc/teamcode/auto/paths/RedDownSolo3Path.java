@@ -15,7 +15,6 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 
 import org.firstinspires.ftc.teamcode.hardware.Globals;
-import org.firstinspires.ftc.teamcode.subsystems.FlowerRampSS;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 
@@ -59,7 +58,7 @@ public class RedDownSolo3Path {
     public Path leave() {
         return Paths.curve(point6, point7Control1, point7).tangent();
     }
-    public Command autoRoutine(Follower follower, IntakeSS intakeSS, FlowerRampSS flowerRampSS, ShooterSS shooterSS) {
+    public Command autoRoutine(Follower follower, IntakeSS intakeSS, ShooterSS shooterSS) {
         return sequential(
                 //todo init
                 parallel(
@@ -79,18 +78,18 @@ public class RedDownSolo3Path {
                         instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
                         //todo shooter locked during path, unlocks at end
                 ),
-                instant(()-> flowerRampSS.updateState(FlowerRampSS.FlowerRampState.DEPLOYED)), //todo flower ramp down for intake
+                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED)), //todo flower ramp down for intake
                 instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
                 waitMs(2000), //todo this is delay for intake and shoot
-                instant(()-> flowerRampSS.updateState(FlowerRampSS.FlowerRampState.UP)),
+                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
                 parallel(
                         follow(follower, adjacentFlower()),
                         instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
                         //todo shooter locked while intaking from flower
                 ),
-                instant(()-> flowerRampSS.updateState(FlowerRampSS.FlowerRampState.DEPLOYED)),
+                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED)),
                 waitMs(1500), //todo this is delay for intake from flower needs tuning
-                instant(()-> flowerRampSS.updateState(FlowerRampSS.FlowerRampState.UP)),
+                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
                 follow(follower, adjacentFlowerShoot()),
                 //todo unlock and shoot
                 instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
