@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.hardware.Side;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.ColorSS;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
@@ -20,6 +21,7 @@ public class STeleOpV2 extends LinearOpMode {
     IntakeSS intakeSS;
     ShooterSS shooterSS;
     TrackingSS trackingSS;
+    ColorSS colorSS;
     Follower follower;
     RobotHardware robot = RobotHardware.getInstance();
     public static Pose startPose = new Pose(0, 0, 0);
@@ -45,12 +47,6 @@ public class STeleOpV2 extends LinearOpMode {
 
     //TODO BALL COLORS
 
-    public enum GameElements {POLLEN, NECTAR, NULL}
-    public GameElements ball1 = GameElements.NULL;
-    public GameElements ball2 = GameElements.NULL;
-    public GameElements ball3 = GameElements.NULL;
-    public GameElements ball4 = GameElements.NULL;
-
     boolean isShooting = false;
 
     @Override
@@ -70,6 +66,8 @@ public class STeleOpV2 extends LinearOpMode {
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
 
         ballCount = 0;
+
+        colorSS.reset();
 
         while (opModeInInit()) {
             if (gamepad1.left_bumper && !lastLB) {
@@ -96,6 +94,7 @@ public class STeleOpV2 extends LinearOpMode {
         }
 
         trackingSS = new TrackingSS(robot, follower, Side.getAlliance());
+        colorSS = new ColorSS(robot, Side.getAlliance());
 
         waitForStart();
 
@@ -108,6 +107,7 @@ public class STeleOpV2 extends LinearOpMode {
         while (opModeIsActive()) {
             follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
             follower.update();
+            colorSS.update(ballCount);
 
             //todo tracking logic
             if (gamepad1.start && !lastStart) {
@@ -161,10 +161,13 @@ public class STeleOpV2 extends LinearOpMode {
             lastX = gamepad1.x;
 
             //todo intake beambreaker logic
-            if (!robot.frontBeam.getState() && lastFrontBeam && ballCount < 4) {
+            boolean frontBeam = robot.frontBeam.getState();
+
+            if (!frontBeam && lastFrontBeam && ballCount < 4) {
                 ballCount++;
             }
-            lastFrontBeam = robot.frontBeam.getState();
+            lastFrontBeam = frontBeam;
+
             /* if front beam not tripped, then lastFrontbeam = true, else if front beam tripped, then last front beam = false
              * so if front beam wasn't tripped and front beam is now tripped, ball count increases by one
              */
@@ -184,47 +187,45 @@ public class STeleOpV2 extends LinearOpMode {
                         intakeSS.updateState(IntakeSS.IntakeState.FEED);
                     }
                 }
-                else if (!robot.pollenBeam.getState() && robot.nectarBeam.getState() && allPollen()) {
+                else if (!robot.pollenBeam.getState() && robot.nectarBeam.getState() && colorSS.allPollen()) {
                     //since all pollen, all 4 balls are in correction positions
                     if (intakeSS.getIntakeState() != IntakeSS.IntakeState.INIT) {
                         intakeSS.updateState(IntakeSS.IntakeState.INIT);
                     }
                 }
-                else if (!robot.nectarBeam.getState() && !robot.midBeam.getState() && robot.pollenBeam.getState() && allNectar()) {
+                else if (!robot.nectarBeam.getState() && !robot.midBeam.getState() && robot.pollenBeam.getState() && colorSS.allNectar()) {
                     //all are nectar, there is nectar in shooter and there is nectar in mid so all balls correct, intake off
                     if (intakeSS.getIntakeState() != IntakeSS.IntakeState.INIT) {
                         intakeSS.updateState(IntakeSS.IntakeState.INIT);
                     }
                 }
-                else if (!allNectar() && !allPollen() && (robot.nectarBeam.getState() || robot.pollenBeam.getState())) {
+                else if (!colorSS.allNectar() && !colorSS.allPollen() && (robot.nectarBeam.getState() || robot.pollenBeam.getState())) {
                     if (intakeSS.getIntakeState() != IntakeSS.IntakeState.FEED) {
                         intakeSS.updateState(IntakeSS.IntakeState.FEED);
                     }
                 }
             }
 
-            if (ballCount >= 1) {
-                shooterEnabled = !shooterEnabled;
+            if (ballCount >= 1 && !shooterEnabled) {
+                shooterEnabled = true;
 
-                if (!shooterEnabled) {
-                    shooterSS.updateState(ShooterSS.ShooterState.INIT);
-                }
-                else if (trackingEnabled) {
+                if (trackingEnabled) {
                     shooterSS.updateState(ShooterSS.ShooterState.INTERPOLATED);
                 }
                 else {
                     shooterSS.updateState(ShooterSS.ShooterState.INTERPOL_DISABLED);
                 }
             }
-            else {
+            else if (ballCount == 0 && shooterEnabled) {
+                shooterEnabled = false;
                 shooterSS.updateState(ShooterSS.ShooterState.INIT);
             }
 
             if (gamepad1.a && !lastA) {
-                if (allNectar()) {
+                if (colorSS.allNectar()) {
                     shooterSS.updateState(ShooterSS.LockState.NECTAR_UNLOCKED);
                 }
-                else if (allPollen()) {
+                else if (colorSS.allPollen()) {
                     shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED);
                 }
                 else {
@@ -232,10 +233,14 @@ public class STeleOpV2 extends LinearOpMode {
                 }
                 isShooting = true;
             }
+            lastA = gamepad1.a;
+
             if (isShooting && isEmpty()) {
                 shooterSS.updateState(ShooterSS.LockState.LOCKED);
                 isShooting = false;
-                ballCount = 0; //shooter off until one beambreaker tripped
+                ballCount = 0;
+                colorSS.reset();
+                lastFrontBeam = robot.frontBeam.getState();
             }
 
             if (trackingEnabled) {
@@ -246,6 +251,7 @@ public class STeleOpV2 extends LinearOpMode {
             telemetry.addData("Tracking", trackingEnabled);
             telemetry.addData("Shooter", shooterEnabled);
             telemetry.addData("Intake", intakeSS.getIntakeState());
+            telemetry.addData("Ball count", ballCount);
 
             if (printData) {
                 telemetry.addLine("");
@@ -279,35 +285,34 @@ public class STeleOpV2 extends LinearOpMode {
                 telemetry.addData("Reference distance", TrackingSS.referenceDist);
                 telemetry.addData("RPM per inch", TrackingSS.rpmPerInch);
                 telemetry.addData("Hood per inch", TrackingSS.hoodPerInch);
+
+                telemetry.addLine("");
+                telemetry.addLine("***Color sensor***");
+                telemetry.addData("Ball 1", colorSS.ball1);
+                telemetry.addData("Ball 2", colorSS.ball2);
+                telemetry.addData("Ball 3", colorSS.ball3);
+                telemetry.addData("Ball 4", colorSS.ball4);
+                telemetry.addData("Hue", colorSS.hue);
+                telemetry.addData("Saturation", colorSS.saturation);
+                telemetry.addData("Distance cm", colorSS.distanceCm);
+
+                telemetry.addLine("");
+                telemetry.addLine("***Beambreakers***");
+                telemetry.addData("Front", robot.frontBeam.getState());
+                telemetry.addData("Mid", robot.midBeam.getState());
+                telemetry.addData("Pollen", robot.pollenBeam.getState());
+                telemetry.addData("Nectar", robot.nectarBeam.getState());
+                telemetry.addData("Ball count", ballCount);
             }
 
             telemetry.update();
         }
     }
 
-    public boolean allPollen() {
-        return (
-                (ball1 == GameElements.POLLEN) &&
-                        (ball2 == GameElements.POLLEN) &&
-                        (ball3 == GameElements.POLLEN) &&
-                        (ball4 == GameElements.POLLEN)
-        );
-    }
-
-    public boolean allNectar() {
-        return (
-                (ball1 == GameElements.NECTAR) &&
-                        (ball2 == GameElements.NECTAR) &&
-                        (ball3 == GameElements.NECTAR) &&
-                        (ball4 == GameElements.NECTAR)
-        );
-    }
     public boolean isEmpty() {
-        return (
-                    robot.frontBeam.getState() &&
-                        robot.pollenBeam.getState() &&
-                        robot.nectarBeam.getState() &&
-                        robot.midBeam.getState()
-                );
+        return robot.frontBeam.getState() &&
+                robot.pollenBeam.getState() &&
+                robot.nectarBeam.getState() &&
+                robot.midBeam.getState();
     }
 }

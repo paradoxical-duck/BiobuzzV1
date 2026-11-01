@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -44,4 +45,12 @@ public class Globals {
     public static double autoTurret = 0.5;
     public static double autoHood = 0.5;
 
+    public static double colorMaxDistanceCm = 5.0;
+    public static double colorMinSaturation = 0.30;
+    public static double pollenHue = 52;
+    public static double pollenHueTolerance = 18;
+    public static double redNectarHue = 0;
+    public static double redNectarHueTolerance = 15;
+    public static double blueNectarHue = 220;
+    public static double blueNectarHueTolerance = 20;
 }

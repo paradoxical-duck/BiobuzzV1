@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -28,6 +29,7 @@ public class RobotHardware {
     public DigitalChannel pollenBeam;
     public DigitalChannel nectarBeam;
     public static boolean enabled = false;
+    public RevColorSensorV3 colorSensor;
     public static RobotHardware instance;
     public static RobotHardware getInstance() {
         if (instance == null) {
@@ -61,5 +63,7 @@ public class RobotHardware {
         nectarBeam = hardwareMap.get(DigitalChannel.class, "nectarBeam");
         midBeam = hardwareMap.get(DigitalChannel.class, "midBeam");
         frontBeam = hardwareMap.get(DigitalChannel.class, "frontBeam");
+
+        colorSensor = hardwareMap.get(RevColorSensorV3.class, "color sensor");
     }
 }
