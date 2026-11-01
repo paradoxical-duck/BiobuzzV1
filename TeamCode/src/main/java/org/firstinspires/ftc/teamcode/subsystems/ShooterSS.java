@@ -126,22 +126,34 @@ public class ShooterSS {
     }
 
     //todo ******************lock*************
-    public enum LockState {UNLOCKED, LOCKED}
+    public enum LockState {UNLOCKED, LOCKED, NECTAR_UNLOCKED, POLLEN_UNLOCKED}
     public LockState lockState = LockState.UNLOCKED;
 
     public void updateState(LockState newState) {
-        double target = 0;
+        double target1 = 0;
+        double target2 = 0;
 
         switch (newState) {
             case UNLOCKED:
-                target = Globals.unlocked;
+                target1 = Globals.unlocked;
+                target2 = Globals.unlocked;
                 break;
             case LOCKED:
-                target = Globals.locked;
+                target1 = Globals.locked;
+                target2 = Globals.locked;
+                break;
+            case NECTAR_UNLOCKED:
+                target1 = Globals.locked;
+                target2 = Globals.unlocked;
+                break;
+            case POLLEN_UNLOCKED:
+                target1 = Globals.unlocked;
+                target2 = Globals.locked;
                 break;
         }
 
-        robot.lock.setPosition(target);
+        robot.lock1.setPosition(target1);
+        robot.lock2.setPosition(target2);
         lockState = newState;
     }
 

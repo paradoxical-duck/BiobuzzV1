@@ -16,7 +16,8 @@ public class RobotHardware {
     public ServoImplEx turret;
     public ServoImplEx hood;
     public ServoImplEx flowerRamp;
-    public ServoImplEx lock;
+    public ServoImplEx lock1;
+    public ServoImplEx lock2;
     public static double P = 0;
     public static double I = 0;
     public static double D = 0;
@@ -53,7 +54,8 @@ public class RobotHardware {
        hood = hardwareMap.get(ServoImplEx.class, "hood");
 
        flowerRamp = hardwareMap.get(ServoImplEx.class, "flower ramp");
-       lock = hardwareMap.get(ServoImplEx.class, "lock");
+       lock1 = hardwareMap.get(ServoImplEx.class, "lock1");
+       lock2 = hardwareMap.get(ServoImplEx.class, "lock2");
        //todo beambreakers
         pollenBeam = hardwareMap.get(DigitalChannel.class, "pollenBeam");
         nectarBeam = hardwareMap.get(DigitalChannel.class, "nectarBeam");

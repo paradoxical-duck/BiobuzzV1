@@ -51,6 +51,8 @@ public class STeleOpV2 extends LinearOpMode {
     public GameElements ball3 = GameElements.NULL;
     public GameElements ball4 = GameElements.NULL;
 
+    boolean isShooting = false;
+
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
@@ -201,7 +203,7 @@ public class STeleOpV2 extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.a && !lastA) {
+            if (ballCount >= 1) {
                 shooterEnabled = !shooterEnabled;
 
                 if (!shooterEnabled) {
@@ -214,7 +216,27 @@ public class STeleOpV2 extends LinearOpMode {
                     shooterSS.updateState(ShooterSS.ShooterState.INTERPOL_DISABLED);
                 }
             }
-            lastA = gamepad1.a;
+            else {
+                shooterSS.updateState(ShooterSS.ShooterState.INIT);
+            }
+
+            if (gamepad1.a && !lastA) {
+                if (allNectar()) {
+                    shooterSS.updateState(ShooterSS.LockState.NECTAR_UNLOCKED);
+                }
+                else if (allPollen()) {
+                    shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED);
+                }
+                else {
+                    shooterSS.updateState(ShooterSS.LockState.UNLOCKED);
+                }
+                isShooting = true;
+            }
+            if (isShooting && isEmpty()) {
+                shooterSS.updateState(ShooterSS.LockState.LOCKED);
+                isShooting = false;
+                ballCount = 0; //shooter off until one beambreaker tripped
+            }
 
             if (trackingEnabled) {
                 TrackingSS.updateTracking(shooterSS);
@@ -279,5 +301,13 @@ public class STeleOpV2 extends LinearOpMode {
                         (ball3 == GameElements.NECTAR) &&
                         (ball4 == GameElements.NECTAR)
         );
+    }
+    public boolean isEmpty() {
+        return (
+                    robot.frontBeam.getState() &&
+                        robot.pollenBeam.getState() &&
+                        robot.nectarBeam.getState() &&
+                        robot.midBeam.getState()
+                );
     }
 }
