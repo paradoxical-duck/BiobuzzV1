@@ -23,29 +23,24 @@ public class DriveTestV1 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         m1 = hardwareMap.get(DcMotorEx.class, "m1");
-        m2 = hardwareMap.get(DcMotorEx.class, "m2");
-        m3 = hardwareMap.get(DcMotorEx.class, "m3");
+        m3 = hardwareMap.get(DcMotorEx.class, "m2");
+        m2 = hardwareMap.get(DcMotorEx.class, "m3");
         m4 = hardwareMap.get(DcMotorEx.class, "m4");
 
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
-        if (isStopRequested()) return;
 
         while (opModeIsActive()) {
             m1.setPower(m1Power);
-            m2.setPower(m2Power);
-            m3.setPower(m3Power);
+            m3.setPower(m2Power);
+            m2.setPower(m3Power);
             m4.setPower(m4Power);
 
             telemetry.addData("m1 current", m1.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("m2 current", m2.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("m3 current", m3.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("m2 current", m3.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("m3 current", m2.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("m4 current", m4.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("m1 power", m1.getPower());
-            telemetry.addData("m2 power", m2.getPower());
-            telemetry.addData("m3 power", m3.getPower());
-            telemetry.addData("m4 power", m4.getPower());
             telemetry.update();
         }
     }
