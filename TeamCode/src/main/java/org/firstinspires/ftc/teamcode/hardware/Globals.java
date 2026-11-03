@@ -7,20 +7,27 @@ import com.pedropathing.math.Pose;
 @Configurable
 @Config
 public class Globals {
+
+    //todo intake
     public static double intakeOn = 1;
     public static double intakeOff = 0;
     public static double intakeRev = -1;
 
-    public static double shooterOnPollen = 1000;
-    public static double shooterOnNectar = 1000;
+    //todo shooter ss
     public static double shooterInit = 0;
 
     public static double turretInit = 0.5;
-    public static double turretShootPosPollen = 0.5;
-    public static double turretShootPosNectar = 0.5;
-
     public static double hoodInit = 0.5;
+
+    //todo shooter ss pollen
+    public static double shooterOnPollen = 1000;
+
+    public static double turretShootPosPollen = 0.5;
     public static double hoodShootPosPollen = 0.5;
+
+    //todo shooter ss nectar
+    public static double shooterOnNectar = 1000;
+    public static double turretShootPosNectar = 0.5;
     public static double hoodShootPosNectar = 0.5;
 
     //todo poses for odo turret tracking
@@ -29,13 +36,14 @@ public class Globals {
     public static Pose blueHiveDownSide = new Pose(84.19, 49.6123);
     public static Pose blueHiveUpSide = new Pose(84.19, 87.1434);
 
+    //todo turret offsets for pollen and nectar
     public static double turretOffsetPollen = 0.0;
     public static double turretOffsetNectar = 0.0;
 
-    //todo flower ramp poses
-    public static double flowerRampUp = 0.5;
-    public static double flowerRampDeployed = 0.5;
-    public static double flowerRampInit = 0.5;
+    //todo flower deploy poses
+    public static double intakeDeployUp = 0.5;
+    public static double intakeDeployDown = 0.5;
+    public static double intakeDeployInit = 0.5;
     //todo TUNE^^^^^^^^^^
 
     //todo shooter lock poses
@@ -65,11 +73,13 @@ public class Globals {
     public static double blueNectarHue = 220;
     public static double blueNectarHueTolerance = 20;
 
+    //todo shooter pidf values pollen
     public static double kP_Pollen = 0;
     public static double kI_Pollen = 0;
     public static double kD_Pollen = 0;
     public static double kF_Pollen = 0;
 
+    //todo shooter pidf values nectar
     public static double kP_Nectar = 0;
     public static double kI_Nectar = 0;
     public static double kD_Nectar = 0;

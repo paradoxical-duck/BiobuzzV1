@@ -44,18 +44,25 @@ public class TrackingTestV1 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+
         turret1 = hardwareMap.get(Servo.class, "turret1");
         turret2 = hardwareMap.get(Servo.class, "turret2");
+
         hood1 = hardwareMap.get(Servo.class, "hood1");
         hood2 = hardwareMap.get(Servo.class, "hood2");
+
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);
         shooter2.setVelocityPIDFCoefficients(Globals.kP_Nectar, Globals.kI_Nectar, Globals.kD_Nectar, Globals.kF_Nectar);
+
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
 

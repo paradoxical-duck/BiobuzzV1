@@ -44,13 +44,13 @@ public class IntakeSS {
         double target = 0;
         switch (newState) {
             case UP:
-                target = Globals.flowerRampUp;
+                target = Globals.intakeDeployUp;
                 break;
             case DEPLOYED:
-                target = Globals.flowerRampDeployed;
+                target = Globals.intakeDeployDown;
                 break;
             case INIT:
-                target = Globals.flowerRampInit;
+                target = Globals.intakeDeployInit;
                 break;
         }
         robot.intakeDeploy.setPosition(target);
