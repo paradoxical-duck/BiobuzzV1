@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.hardware.Side;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ColorSS;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
@@ -58,8 +57,8 @@ public class STeleOpV2 extends LinearOpMode {
         shooterSS = new ShooterSS(robot);
 
 
-        trackingSS = new TrackingSS(robot, follower, Side.getAlliance());
-        colorSS = new ColorSS(robot, Side.getAlliance());
+        trackingSS = new TrackingSS(robot, follower, RobotHardware.alliance);
+        colorSS = new ColorSS(robot, RobotHardware.alliance);
 
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
@@ -80,10 +79,10 @@ public class STeleOpV2 extends LinearOpMode {
             lastLB = gamepad1.left_bumper;
 
             if (red) {
-                Side.setAlliance(Side.ALLIANCE.RED);
+                RobotHardware.alliance = RobotHardware.Alliance.RED;
             }
             else {
-                Side.setAlliance(Side.ALLIANCE.BLUE);
+                RobotHardware.alliance = RobotHardware.Alliance.BLUE;
             }
 
             if (gamepad1.left_trigger > 0.3 && !lastLT) {
@@ -92,7 +91,7 @@ public class STeleOpV2 extends LinearOpMode {
             lastLT = gamepad1.left_trigger > 0.3;
 
             telemetry.addLine("Initialized");
-            telemetry.addLine(Side.getAlliance() + " alliance active");
+            telemetry.addLine(RobotHardware.alliance + " alliance active");
             telemetry.addData("Print data", printData);
             telemetry.update();
         }
@@ -249,7 +248,7 @@ public class STeleOpV2 extends LinearOpMode {
                 TrackingSS.updateTracking(shooterSS);
             }
 
-            telemetry.addData("Alliance", Side.getAlliance());
+            telemetry.addData("Alliance", RobotHardware.alliance);
             telemetry.addData("Tracking", trackingEnabled);
             telemetry.addData("Shooter", shooterEnabled);
             telemetry.addData("Intake", intakeSS.getIntakeState());
@@ -264,21 +263,21 @@ public class STeleOpV2 extends LinearOpMode {
 
                 telemetry.addLine("");
                 telemetry.addLine("***Shooter***");
-                telemetry.addData("Shooter state", shooterSS.getShooterState());
+                telemetry.addData("Shooter state", shooterSS.getPollenShooterState() + " / " + shooterSS.getNectarShooterState());
                 telemetry.addData("Target velocity", TrackingSS.getTargetRpm());
                 telemetry.addData("Shooter 1 velocity", robot.shooter1.getVelocity());
                 telemetry.addData("Shooter 2 velocity", robot.shooter2.getVelocity());
 
                 telemetry.addLine("");
                 telemetry.addLine("***Hood***");
-                telemetry.addData("Hood state", shooterSS.getHoodState());
+                telemetry.addData("Hood state", shooterSS.getPollenHoodState() + " / " + shooterSS.getNectarHoodState());
                 telemetry.addData("Target hood", TrackingSS.getTargetHood());
-                telemetry.addData("Hood position", robot.hood.getPosition());
+                telemetry.addData("Hood position", robot.hood1.getPosition() + " / " + robot.hood2.getPosition());
 
                 telemetry.addLine("");
                 telemetry.addLine("***Turret***");
-                telemetry.addData("Turret state", shooterSS.getTurretState());
-                telemetry.addData("Turret position", robot.turret.getPosition());
+                telemetry.addData("Turret state", shooterSS.getPollenTurretState() + " / " + shooterSS.getNectarTurretState());
+                telemetry.addData("Turret position", robot.turret1.getPosition() + " / " + robot.turret2.getPosition());
                 telemetry.addData("Turret angle", TrackingSS.getTurret());
 
                 telemetry.addLine("");

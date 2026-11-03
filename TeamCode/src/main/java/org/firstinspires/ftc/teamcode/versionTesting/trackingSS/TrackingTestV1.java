@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.hardware.Side;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
@@ -20,7 +19,7 @@ public class TrackingTestV1 extends LinearOpMode {
     TrackingSS trackingSS;
     RobotHardware robot = RobotHardware.getInstance();
     Follower follower;
-    Side.ALLIANCE alliance = Side.ALLIANCE.RED;
+    RobotHardware.Alliance alliance = RobotHardware.Alliance.RED;
     ShooterSS shooterSS;
     boolean lastLB = false;
     boolean red = true;
@@ -44,16 +43,16 @@ public class TrackingTestV1 extends LinearOpMode {
             lastLB = gamepad1.left_bumper;
 
             if (red) {
-                alliance = Side.ALLIANCE.RED;
+                alliance = RobotHardware.Alliance.RED;
             }
             else {
-                alliance = Side.ALLIANCE.BLUE;
+                alliance = RobotHardware.Alliance.BLUE;
             }
 
-            Side.setAlliance(alliance);
+            RobotHardware.alliance = alliance;
 
             telemetry.addLine("Initialized");
-            telemetry.addLine(Side.getAlliance() + " alliance active");
+            telemetry.addLine(RobotHardware.alliance + " alliance active");
             telemetry.update();
         }
 
@@ -143,24 +142,24 @@ public class TrackingTestV1 extends LinearOpMode {
 
             telemetry.addLine("");
             telemetry.addLine("***Turret***");
-            telemetry.addData("Turret state", shooterSS.getTurretState());
-            telemetry.addData("Turret position", robot.turret.getPosition());
+            telemetry.addData("Turret state", shooterSS.getPollenTurretState() + " / " + shooterSS.getNectarTurretState());
+            telemetry.addData("Turret position", robot.turret1.getPosition() + " / " + robot.turret2.getPosition());
             telemetry.addData("Turret angle", TrackingSS.getTurret());
             telemetry.addData("Target dx", TrackingSS.dx);
             telemetry.addData("Target dy", TrackingSS.dy);
 
             telemetry.addLine("");
             telemetry.addLine("***Shooter***");
-            telemetry.addData("Shooter state", shooterSS.getShooterState());
+            telemetry.addData("Shooter state", shooterSS.getPollenShooterState() + " / " + shooterSS.getNectarShooterState());
             telemetry.addData("Target velocity", TrackingSS.getTargetRpm());
             telemetry.addData("Shooter 1 velocity", robot.shooter1.getVelocity());
             telemetry.addData("Shooter 2 velocity", robot.shooter2.getVelocity());
 
             telemetry.addLine("");
             telemetry.addLine("***Hood***");
-            telemetry.addData("Hood state", shooterSS.getHoodState());
+            telemetry.addData("Hood state", shooterSS.getPollenHoodState() + " / " + shooterSS.getNectarHoodState());
             telemetry.addData("Target hood", TrackingSS.getTargetHood());
-            telemetry.addData("Hood position", robot.hood.getPosition());
+            telemetry.addData("Hood position", robot.hood1.getPosition() + " / " + robot.hood2.getPosition());
 
             telemetry.addLine("");
             telemetry.addLine("***Interpolation***");

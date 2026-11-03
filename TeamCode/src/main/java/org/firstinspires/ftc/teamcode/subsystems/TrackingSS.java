@@ -7,12 +7,11 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.hardware.Side;
 
 public class TrackingSS {
     public static RobotHardware robot = RobotHardware.getInstance();
     public static Follower follower;
-    public static Side.ALLIANCE alliance;
+    public static RobotHardware.Alliance alliance;
     public static double dy = 0;
     public static double dx = 0;
 
@@ -33,7 +32,7 @@ public class TrackingSS {
     public static double rangeVal = 0;
     public static double referenceDist = 0;
 
-    public TrackingSS(RobotHardware robot, Follower follower, Side.ALLIANCE alliance) {
+    public TrackingSS(RobotHardware robot, Follower follower, RobotHardware.Alliance alliance) {
         this.robot = robot;
         this.follower = follower;
         this.alliance = alliance;

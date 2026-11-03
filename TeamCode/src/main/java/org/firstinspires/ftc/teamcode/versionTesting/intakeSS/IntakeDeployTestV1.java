@@ -8,18 +8,18 @@ import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 @TeleOp(group = "Version Testing")
 @Configurable
-public class FlowerRampTestV1 extends LinearOpMode {
+public class IntakeDeployTestV1 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
-    public static double flowerRampPos = 0;
+    public static double intakeDeployPos = 0;
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
         waitForStart();
         while (opModeIsActive()) {
-            robot.flowerRamp.setPosition(flowerRampPos);
+            robot.intakeDeploy.setPosition(intakeDeployPos);
 
-            telemetry.addData("target pos", flowerRampPos);
-            telemetry.addData("current pos", flowerRampPos);
+            telemetry.addData("target pos", intakeDeployPos);
+            telemetry.addData("current pos", intakeDeployPos);
             telemetry.update();
         }
     }
