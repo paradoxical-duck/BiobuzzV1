@@ -53,7 +53,7 @@ public class IntakeSS {
                 target = Globals.flowerRampInit;
                 break;
         }
-        robot.flowerRamp.setPosition(target);
+        robot.intakeDeploy.setPosition(target);
         flowerRampState = newState;
     }
     public FlowerRampState getFlowerRampState() {

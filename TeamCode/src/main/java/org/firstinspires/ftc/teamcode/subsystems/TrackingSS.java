@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.pedropathing.follower.Follower;
@@ -16,26 +15,47 @@ public class TrackingSS {
     public static double dx = 0;
 
     // todo turret tracking constants
-    public static double deadband = 2.0;
-    public static double kP = 0.032;
-    public static double kS = 0.015;
-    public static double turretLeft = 0.1283, turretRight = 0.9561; //todo tune required
-    public static double current = 0.5;
+    public static double deadbandPollen = 2.0;
+    public static double deadbandNectar = 2.0;
+
+    public static double kP_Pollen = 0.032;
+    public static double kP_Nectar = 0.032;
+    public static double kS_Pollen = 0.015;
+    public static double kS_Nectar = 0.015;
+
+    public static double turretLeftPollen = 0.1283;
+    public static double turretRightPollen = 0.9561;
+    public static double turretLeftNectar = 0.1283;
+    public static double turretRightNectar = 0.9561;
+
+    public static double currentPollen = Globals.turretInit;
+    public static double currentNectar = Globals.turretInit;
+
+    public static double turretMinAnglePollen = -42.9;
+    public static double turretMaxAnglePollen = 249.2;
+    public static double turretMinAngleNectar = -42.9;
+    public static double turretMaxAngleNectar = 249.2;
 
     //todo shooter and hood interpolation constants
     public static Pose shootPose = new Pose(72, 40, 0);
-    public static double rpmPerInch = 0;
-    public static double hoodPerInch = 0;
 
-    public static double targetRpm = Globals.shooterOn;
-    public static double targetHood = Globals.hoodShootPos;
+    public static double rpmPerInchPollen = 0;
+    public static double rpmPerInchNectar = 0;
+    public static double hoodPerInchPollen = 0;
+    public static double hoodPerInchNectar = 0;
+
+    public static double targetRpmPollen = Globals.shooterOnPollen;
+    public static double targetRpmNectar = Globals.shooterOnNectar;
+    public static double targetHoodPollen = Globals.hoodShootPosPollen;
+    public static double targetHoodNectar = Globals.hoodShootPosNectar;
+
     public static double rangeVal = 0;
     public static double referenceDist = 0;
 
     public TrackingSS(RobotHardware robot, Follower follower, RobotHardware.Alliance alliance) {
-        this.robot = robot;
-        this.follower = follower;
-        this.alliance = alliance;
+        TrackingSS.robot = robot;
+        TrackingSS.follower = follower;
+        TrackingSS.alliance = alliance;
     }
 
     public static void setDxAndDy() {
@@ -67,29 +87,92 @@ public class TrackingSS {
     }
 
     //todo ***************** TURRET TRACKING ************************
-    public static double getTurretPos() {
+    public static double getPollenTurretPos() {
         setDxAndDy();
 
-        double targetHeading = Math.atan2(dy, dx); // arctan function using perpendicular and base to find theta :)
+        double targetHeading = Math.atan2(dy, dx);
         double robotHeading = follower.pose().heading();
 
-        double turretTarget = angleWrap(targetHeading - robotHeading);
-        double turretCurrent = Math.toRadians(getTurret());
+        double turretTarget = angleWrap(
+                targetHeading - robotHeading + Math.toRadians(Globals.turretOffsetPollen)
+        );
 
+        double turretCurrent = Math.toRadians(getPollenTurret());
         double error = angleWrap(turretTarget - turretCurrent);
 
-        if (Math.abs(Math.toDegrees(error)) > deadband) {
-            double adjustment = error * kP;
-            if (Math.abs(Math.toDegrees(error)) > deadband + 1.5) {
-                adjustment += Math.signum(error) * kS;
+        if (Math.abs(Math.toDegrees(error)) > deadbandPollen) {
+            double adjustment = error * kP_Pollen;
+
+            if (Math.abs(Math.toDegrees(error)) > deadbandPollen + 1.5) {
+                adjustment += Math.signum(error) * kS_Pollen;
             }
-            current = Range.clip(current + adjustment, turretLeft, turretRight);
+
+            currentPollen = Range.clip(
+                    currentPollen + adjustment,
+                    turretLeftPollen,
+                    turretRightPollen
+            );
         }
-        return current;
+
+        return currentPollen;
+    }
+
+    public static double getNectarTurretPos() {
+        setDxAndDy();
+
+        double targetHeading = Math.atan2(dy, dx);
+        double robotHeading = follower.pose().heading();
+
+        double turretTarget = angleWrap(
+                targetHeading - robotHeading + Math.toRadians(Globals.turretOffsetNectar)
+        );
+
+        double turretCurrent = Math.toRadians(getNectarTurret());
+        double error = angleWrap(turretTarget - turretCurrent);
+
+        if (Math.abs(Math.toDegrees(error)) > deadbandNectar) {
+            double adjustment = error * kP_Nectar;
+
+            if (Math.abs(Math.toDegrees(error)) > deadbandNectar + 1.5) {
+                adjustment += Math.signum(error) * kS_Nectar;
+            }
+
+            currentNectar = Range.clip(
+                    currentNectar + adjustment,
+                    turretLeftNectar,
+                    turretRightNectar
+            );
+        }
+
+        return currentNectar;
+    }
+
+    public static double getTurretPos() {
+        return getPollenTurretPos();
+    }
+
+    public static double getPollenTurret() {
+        return map(
+                currentPollen,
+                turretLeftPollen,
+                turretRightPollen,
+                turretMinAnglePollen,
+                turretMaxAnglePollen
+        );
+    }
+
+    public static double getNectarTurret() {
+        return map(
+                currentNectar,
+                turretLeftNectar,
+                turretRightNectar,
+                turretMinAngleNectar,
+                turretMaxAngleNectar
+        );
     }
 
     public static double getTurret() {
-        return map(current, turretLeft, turretRight, -42.9, 249.2);
+        return getPollenTurret();
     }
 
     public static double map(double val, double inMin, double inMax, double outMin, double outMax) {
@@ -97,8 +180,12 @@ public class TrackingSS {
     }
 
     public static double angleWrap(double error) {
-        while (error > Math.PI) error -= 2 * Math.PI;
-        while (error < -Math.PI) error += 2 * Math.PI;
+        while (error > Math.PI) {
+            error -= 2 * Math.PI;
+        }
+        while (error < -Math.PI) {
+            error += 2 * Math.PI;
+        }
         return error;
     }
 
@@ -113,7 +200,6 @@ public class TrackingSS {
         double goalY = robotY + dy;
 
         rangeVal = Math.hypot(dx, dy);
-
         referenceDist = Math.hypot(
                 goalX - shootPose.x(),
                 goalY - shootPose.y()
@@ -121,26 +207,63 @@ public class TrackingSS {
 
         double distanceError = rangeVal - referenceDist;
 
-        targetRpm = Math.max(0,
-                Globals.shooterOn + distanceError * rpmPerInch);
+        targetRpmPollen = Math.max(
+                0,
+                Globals.shooterOnPollen + distanceError * rpmPerInchPollen
+        );
 
-        targetHood = Range.clip(
-                Globals.hoodShootPos + distanceError * hoodPerInch,
-                0.0, 1.0);
+        targetRpmNectar = Math.max(
+                0,
+                Globals.shooterOnNectar + distanceError * rpmPerInchNectar
+        );
+
+        targetHoodPollen = Range.clip(
+                Globals.hoodShootPosPollen + distanceError * hoodPerInchPollen,
+                0.0,
+                1.0
+        );
+
+        targetHoodNectar = Range.clip(
+                Globals.hoodShootPosNectar + distanceError * hoodPerInchNectar,
+                0.0,
+                1.0
+        );
+    }
+
+    public static double getTargetRpmPollen() {
+        return targetRpmPollen;
+    }
+
+    public static double getTargetRpmNectar() {
+        return targetRpmNectar;
+    }
+
+    public static double getTargetHoodPollen() {
+        return targetHoodPollen;
+    }
+
+    public static double getTargetHoodNectar() {
+        return targetHoodNectar;
     }
 
     public static double getTargetRpm() {
-        return targetRpm;
+        return targetRpmPollen;
     }
 
     public static double getTargetHood() {
-        return targetHood;
+        return targetHoodPollen;
     }
 
     public static void updateTracking(ShooterSS shooterSS) {
-        shooterSS.setTurretTarget(getTurretPos());
+        shooterSS.setPollenTurretTarget(getPollenTurretPos());
+        shooterSS.setNectarTurretTarget(getNectarTurretPos());
+
         interpolate();
-        shooterSS.setShooterTarget(getTargetRpm());
-        shooterSS.setHoodTarget(getTargetHood());
+
+        shooterSS.setPollenShooterTarget(getTargetRpmPollen());
+        shooterSS.setNectarShooterTarget(getTargetRpmNectar());
+
+        shooterSS.setPollenHoodTarget(getTargetHoodPollen());
+        shooterSS.setNectarHoodTarget(getTargetHoodNectar());
     }
 }

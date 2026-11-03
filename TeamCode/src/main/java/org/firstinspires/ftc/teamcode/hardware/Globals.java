@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -9,23 +8,27 @@ public class Globals {
     public static double intakeOn = 1;
     public static double intakeOff = 0;
     public static double intakeRev = -1;
-    public static double shooterOn = 1000; //todo tune
+
+    public static double shooterOnPollen = 1000;
+    public static double shooterOnNectar = 1000;
     public static double shooterInit = 0;
+
     public static double turretInit = 0.5;
-    public static double hoodShootPos = 0.5; //todo tune
+    public static double turretShootPosPollen = 0.5;
+    public static double turretShootPosNectar = 0.5;
+
     public static double hoodInit = 0.5;
-    public static double turretShootPos = 0.5;
+    public static double hoodShootPosPollen = 0.5;
+    public static double hoodShootPosNectar = 0.5;
+
     //todo poses for odo turret tracking
     public static Pose redHiveDownSide = new Pose(57.75, 52.5292);
     public static Pose redHiveUpSide = new Pose(57.75, 85.5877);
     public static Pose blueHiveDownSide = new Pose(84.19, 49.6123);
     public static Pose blueHiveUpSide = new Pose(84.19, 87.1434);
-    public static double turretOffset = 0.0; //TODO MAY BE REQUIRED FOR DOUBBLE TURRET WITH 2 SERVOS
-    //todo shooter PIDF
-    public static double P = 0;
-    public static double I = 0;
-    public static double D = 0;
-    public static double F = 0;
+
+    public static double turretOffsetPollen = 0.0;
+    public static double turretOffsetNectar = 0.0;
 
     //todo flower ramp poses
     public static double flowerRampUp = 0.5;
@@ -60,8 +63,6 @@ public class Globals {
     public static double blueNectarHue = 220;
     public static double blueNectarHueTolerance = 20;
 
-
-
     public static double kP_Pollen = 0;
     public static double kI_Pollen = 0;
     public static double kD_Pollen = 0;
@@ -71,5 +72,4 @@ public class Globals {
     public static double kI_Nectar = 0;
     public static double kD_Nectar = 0;
     public static double kF_Nectar = 0;
-
 }

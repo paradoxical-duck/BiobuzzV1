@@ -3,29 +3,33 @@ package org.firstinspires.ftc.teamcode.versionTesting.intakeSS;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 @TeleOp(group = "Version Testing")
 @Configurable
 public class IntakeTestV1 extends LinearOpMode {
-    RobotHardware robot = RobotHardware.getInstance();
-    public static double intake1Pwr = 0;
-    public static double intake2Pwr = 0;
+//    RobotHardware robot = RobotHardware.getInstance();
+    DcMotorEx intake1;
+    DcMotorEx intake2;
+    public static double intake1Pwr = 1;
+    public static double intake2Pwr = 1;
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(hardwareMap);
+//        robot.init(hardwareMap);
+        intake1 = hardwareMap.get(DcMotorEx.class, "intake1");
+        intake2 = hardwareMap.get(DcMotorEx.class, "intake2");
         waitForStart();
         while (opModeIsActive()) {
-            robot.intake1.setPower(intake1Pwr);
-            robot.intake2.setPower(intake2Pwr);
+            intake1.setPower(intake1Pwr);
+            intake2.setPower(intake2Pwr);
 
             telemetry.addData("intake1 pwr", intake1Pwr);
             telemetry.addData("intake2 pwr", intake2Pwr);
 
-            telemetry.addData("intake1 current",robot.intake1.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("intake2 current",robot.intake2.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("intake1 current", intake1.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("intake2 current", intake2.getCurrent(CurrentUnit.AMPS));
             telemetry.update();
         }
     }

@@ -194,8 +194,8 @@ public class STeleOpV1 extends LinearOpMode {
                 telemetry.addLine("***Interpolation***");
                 telemetry.addData("Distance", TrackingSS.rangeVal);
                 telemetry.addData("Reference distance", TrackingSS.referenceDist);
-                telemetry.addData("RPM per inch", TrackingSS.rpmPerInch);
-                telemetry.addData("Hood per inch", TrackingSS.hoodPerInch);
+                telemetry.addData("RPM per inch", TrackingSS.rpmPerInchPollen);
+                telemetry.addData("Hood per inch", TrackingSS.hoodPerInchPollen);
             }
 
             telemetry.update();
