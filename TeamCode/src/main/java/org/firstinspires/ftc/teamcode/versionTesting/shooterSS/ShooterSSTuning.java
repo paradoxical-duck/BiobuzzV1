@@ -25,7 +25,6 @@ public class ShooterSSTuning extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-
             robot.shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);
             robot.shooter2.setVelocityPIDFCoefficients(Globals.kP_Nectar, Globals.kI_Nectar, Globals.kD_Nectar, Globals.kF_Nectar);
 
