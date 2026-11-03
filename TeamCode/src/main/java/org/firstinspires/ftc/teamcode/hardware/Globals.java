@@ -2,7 +2,6 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 
 @Configurable
@@ -40,11 +39,18 @@ public class Globals {
     //todo tune
     public static double shootDelayMs = 500; //todo figure out actual delay
     public static double shootRevDelayMs = 250; //todo figure out
-    //todo auto shooter values todo tune
-    public static double autoShoot = 1000;
-    public static double autoTurret = 0.5;
-    public static double autoHood = 0.5;
 
+    //todo auto values pollen
+    public static double autoShootPollen = 1000;
+    public static double autoTurretPollen = 0.5;
+    public static double autoHoodPollen = 0.5;
+
+    //todo auto values nectar
+    public static double autoShootNectar = 1000;
+    public static double autoTurretNectar = 0.5;
+    public static double autoHoodNectar = 0.5;
+
+    //todo color sensor
     public static double colorMaxDistanceCm = 5.0;
     public static double colorMinSaturation = 0.30;
     public static double pollenHue = 52;

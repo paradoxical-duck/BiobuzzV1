@@ -57,7 +57,7 @@ public class ShooterSS {
             case INTERPOLATED:
                 return interpolatedTarget;
             case AUTO:
-                return Globals.autoShoot;
+                return Globals.autoShootNectar;
         }
         return 0;
     }
@@ -117,7 +117,7 @@ public class ShooterSS {
             case SHOOT:
                 return Globals.turretShootPos;
             case AUTO:
-                return Globals.autoTurret;
+                return Globals.autoTurretNectar;
         }
         return currentPosition;
     }
@@ -177,7 +177,7 @@ public class ShooterSS {
             case SHOOT:
                 return Globals.hoodShootPos;
             case AUTO:
-                return Globals.autoHood;
+                return Globals.autoHoodNectar;
         }
         return currentPosition;
     }
