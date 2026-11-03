@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 @Autonomous
 //todo before auto: GET VALUES FOR AUTO SHOOT TURRET AND HOOD
 public class RedDownSolo3 extends LinearOpMode {
-    RobotHardware robot= RobotHardware.getInstance();
+    RobotHardware robot = RobotHardware.getInstance();
 
     Follower follower;
     RedDownSolo3Path path;

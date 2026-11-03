@@ -3,7 +3,7 @@
 #### Tune in this order only: 
 
 1. Start with `IntakeTestV1` to tune intake power and direction
-2. Next, run `FlowerRampTestV1` to tune the flower ramp, finishing IntakeSS tuning
+2. Next, run `IntakeDeployTestV1` to tune the flower ramp, finishing IntakeSS tuning
 3. After that, start ShooterSS tuning with `ShooterTestV1`, to tune the shooter motor direction individually, and shooter PIDF
 4. Next, run `ShooterSSTuning` to tune fixed shooting positions for turret, shooter and hood in teleOp for when interpol/tracking is disabled, and for auto (using fixed shooting only in auto)
 5. Next, run `TurretTestV1` to get turret extreme servo positions for turret tracking
