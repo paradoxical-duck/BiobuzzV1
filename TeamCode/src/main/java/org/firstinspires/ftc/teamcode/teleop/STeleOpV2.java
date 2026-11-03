@@ -57,6 +57,10 @@ public class STeleOpV2 extends LinearOpMode {
         intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 
+
+        trackingSS = new TrackingSS(robot, follower, Side.getAlliance());
+        colorSS = new ColorSS(robot, Side.getAlliance());
+
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
 
@@ -93,8 +97,6 @@ public class STeleOpV2 extends LinearOpMode {
             telemetry.update();
         }
 
-        trackingSS = new TrackingSS(robot, follower, Side.getAlliance());
-        colorSS = new ColorSS(robot, Side.getAlliance());
 
         waitForStart();
 
