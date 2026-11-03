@@ -53,4 +53,17 @@ public class Globals {
     public static double redNectarHueTolerance = 15;
     public static double blueNectarHue = 220;
     public static double blueNectarHueTolerance = 20;
+
+
+
+    public static double kP_Pollen = 0;
+    public static double kI_Pollen = 0;
+    public static double kD_Pollen = 0;
+    public static double kF_Pollen = 0;
+
+    public static double kP_Nectar = 0;
+    public static double kI_Nectar = 0;
+    public static double kD_Nectar = 0;
+    public static double kF_Nectar = 0;
+
 }

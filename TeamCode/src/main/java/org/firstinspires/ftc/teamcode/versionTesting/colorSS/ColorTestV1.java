@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.hardware.Side;
 import org.firstinspires.ftc.teamcode.subsystems.ColorSS;
 
 @TeleOp(group = "Version Testing")
@@ -15,7 +14,7 @@ public class ColorTestV1 extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
-        colorSS = new ColorSS(robot, Side.getAlliance());
+        colorSS = new ColorSS(robot, RobotHardware.alliance);
 
         waitForStart();
 

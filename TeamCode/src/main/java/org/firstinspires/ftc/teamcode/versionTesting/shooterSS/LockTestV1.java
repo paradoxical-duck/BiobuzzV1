@@ -17,10 +17,10 @@ public class LockTestV1 extends LinearOpMode {
         robot.init(hardwareMap);
         waitForStart();
         while (opModeIsActive()) {
-            robot.lock1.setPosition(lock1Pos);
-            robot.lock2.setPosition(lock2Pos);
-            telemetry.addData("lock1 pos", lock1Pos);
-            telemetry.addData("lock2 pos", lock2Pos);
+            robot.feedLock1.setPosition(lock1Pos);
+            robot.feedLock2.setPosition(lock2Pos);
+            telemetry.addData("feedlock1 pos", lock1Pos);
+            telemetry.addData("feedlock2 pos", lock2Pos);
             telemetry.update();
         }
     }

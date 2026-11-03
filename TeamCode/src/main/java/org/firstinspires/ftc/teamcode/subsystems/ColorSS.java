@@ -6,11 +6,10 @@ import android.graphics.Color;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.hardware.Side;
 
 public class ColorSS {
     RobotHardware robot = RobotHardware.getInstance();
-    Side.ALLIANCE alliance;
+    RobotHardware.Alliance alliance;
 
     public enum GameElements {POLLEN, NECTAR, NULL}
 
@@ -24,7 +23,7 @@ public class ColorSS {
     public double value = 0;
     public double distanceCm = 0;
 
-    public ColorSS(RobotHardware robot, Side.ALLIANCE alliance) {
+    public ColorSS(RobotHardware robot, RobotHardware.Alliance alliance) {
         this.robot = robot;
         this.alliance = alliance;
     }
@@ -93,7 +92,7 @@ public class ColorSS {
         double nectarHue;
         double nectarTolerance;
 
-        if (alliance == Side.ALLIANCE.RED) {
+        if (alliance == RobotHardware.Alliance.RED) {
             nectarHue = Globals.redNectarHue;
             nectarTolerance = Globals.redNectarHueTolerance;
         }

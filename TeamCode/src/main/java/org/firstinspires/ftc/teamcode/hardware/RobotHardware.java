@@ -1,36 +1,82 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+// extra imports
+import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+import java.util.List;
+
 @Configurable
 public class RobotHardware {
+    public List<LynxModule> allHubs;
+    //TODO =====  INTAKE=====
     public DcMotorEx intake1;
     public DcMotorEx intake2;
-    public DcMotorEx shooter1;
-    public DcMotorEx shooter2;
-    public ServoImplEx turret;
-    public ServoImplEx hood;
-    public ServoImplEx flowerRamp;
-    public ServoImplEx lock1;
-    public ServoImplEx lock2;
-    public static double P = 0;
-    public static double I = 0;
-    public static double D = 0;
-    public static double F = 0;
-    // todo beambreakers
+    public ServoImplEx intakeDeploy;
+
+    //TODO =====  SHOOTER - Pollen  =====
+    public DcMotorEx shooter1;  //Pollen
+    public ServoImplEx turret1;
+    public ServoImplEx hood1;
+
+    //TODO =====  SHOOTER - Nectar  =====
+    public DcMotorEx shooter2;  //Nectar
+    public ServoImplEx turret2;
+    public ServoImplEx hood2;
+
+    //TODO =====  FEEDER LOCKS  =====
+    public ServoImplEx feedLock1; //Pollen
+    public ServoImplEx feedLock2; //Nectar
+
+
+    //TODO =====  BEAM BREAKERS  =====
     public DigitalChannel frontBeam;
     public DigitalChannel midBeam;
     public DigitalChannel pollenBeam;
     public DigitalChannel nectarBeam;
-    public static boolean enabled = false;
+
+    //TODO =====  COLOR SENSOR  =====
     public RevColorSensorV3 colorSensor;
-    public static RobotHardware instance;
+
+
+    //TODO =====  ALLIANCE  =====
+    public enum Alliance { RED, BLUE }
+    public static Alliance alliance = Alliance.RED; // static so auto's choice carries into teleop
+
+    public static boolean isRed() { return alliance == Alliance.RED; }
+    public static void toggleAlliance() { alliance = isRed() ? Alliance.BLUE : Alliance.RED; }
+
+    //TODO =====  GAMEPADS (for toggles)  =====
+    public final Gamepad currentGamepad1 = new Gamepad();
+    public final Gamepad currentGamepad2 = new Gamepad();
+    public final Gamepad previousGamepad1 = new Gamepad();
+    public final Gamepad previousGamepad2 = new Gamepad();
+
+    //TODO =====  VOLTAGE + LOOP TIME  =====
+    public VoltageSensor voltageSensor;
+    public double voltage = 12;
+    public double loopTimeMs = 0;
+    private final ElapsedTime loopTimer = new ElapsedTime();
+
+    public boolean enabled = false;
+    private HardwareMap hardwareMap ;
+
+    public static RobotHardware instance = null;
+
     public static RobotHardware getInstance() {
         if (instance == null) {
             instance = new RobotHardware();
@@ -38,32 +84,106 @@ public class RobotHardware {
         instance.enabled = true;
         return instance;
     }
+
     public void init(HardwareMap hardwareMap) {
+
+        this.hardwareMap = hardwareMap;
+        allHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+        //TODO =====  INTAKE=====
        intake1 = hardwareMap.get(DcMotorEx.class, "intake1");
        intake2 = hardwareMap.get(DcMotorEx.class, "intake2");
+       intake1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+       intake2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-       intake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-       intake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeDeploy = hardwareMap.get(ServoImplEx.class, "intakeDeploy");
 
-       shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-       shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        //TODO =====  SHOOTER - Pollen  =====
+        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+        turret1 = hardwareMap.get(ServoImplEx.class, "turret1");
+        hood1 = hardwareMap.get(ServoImplEx.class, "hood1");
+//        shooter1.setVelocityPIDFCoefficients(P, I, D, F);
+        shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-       shooter1.setVelocityPIDFCoefficients(P, I, D, F);
-       shooter2.setVelocityPIDFCoefficients(P, I, D, F);
+        //TODO =====  SHOOTER - Nectar  =====
+        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        turret2 = hardwareMap.get(ServoImplEx.class, "turret2");
+        hood2 = hardwareMap.get(ServoImplEx.class, "hood2");
+//        shooter1.setVelocityPIDFCoefficients(P, I, D, F);
+        shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-       turret = hardwareMap.get(ServoImplEx.class, "turret");
-       //TODO TURRET MAY BE 2 SERVOSSSSSSSSS
-       hood = hardwareMap.get(ServoImplEx.class, "hood");
+        //TODO =====  FEEDER LOCKS  =====
+       feedLock1 = hardwareMap.get(ServoImplEx.class, "feedLock1");  //Pollen
+       feedLock2 = hardwareMap.get(ServoImplEx.class, "feedLock2");  //Nectar
 
-       flowerRamp = hardwareMap.get(ServoImplEx.class, "flower ramp");
-       lock1 = hardwareMap.get(ServoImplEx.class, "lock1");
-       lock2 = hardwareMap.get(ServoImplEx.class, "lock2");
-       //todo beambreakers
+
+        //TODO =====  BEAM BREAKERS  =====
         pollenBeam = hardwareMap.get(DigitalChannel.class, "pollenBeam");
         nectarBeam = hardwareMap.get(DigitalChannel.class, "nectarBeam");
         midBeam = hardwareMap.get(DigitalChannel.class, "midBeam");
         frontBeam = hardwareMap.get(DigitalChannel.class, "frontBeam");
 
+        //TODO =====  COLOR SENSOR  =====
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "color sensor");
+
+        voltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
+    public void clearBulkCache() {
+        if (allHubs == null) return;
+
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
+    }
+
+    /** Updates loop time and voltage. Call robot.clearBulkCache() separately. */
+    public void update() {
+        loopTimeMs = loopTimer.milliseconds();
+        loopTimer.reset();
+        voltage = voltageSensor.getVoltage();
+    }
+
+    /** Call once per loop, before reading buttons. */
+    public void readGamepads(Gamepad gamepad1, Gamepad gamepad2) {
+        previousGamepad1.copy(currentGamepad1);
+        previousGamepad2.copy(currentGamepad2);
+        currentGamepad1.copy(gamepad1);
+        currentGamepad2.copy(gamepad2);
+    }
+
+    /** True only on the loop the button goes down. */
+    public static boolean pressed(boolean now, boolean last) { return now && !last; }
+
+    /** Beam breakers read false when something is blocking them. */
+    public static boolean blocked(DigitalChannel beam) { return !beam.getState(); }
+
+    /** Sets heading to 0 and keeps x/y. Use for field-centric drive. */
+    public static void resetYaw(Follower follower) {
+        Pose p = follower.pose();
+        follower.setPose(new Pose(p.x(), p.y(), 0));
+    }
+
+    /** Re-applies the PIDF values from Globals, so Panels edits take effect. */
+    public void applyShooterPIDF() {
+        shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);
+        shooter2.setVelocityPIDFCoefficients(Globals.kP_Nectar, Globals.kI_Nectar, Globals.kD_Nectar, Globals.kF_Nectar);
+    }
+
+    /** Stops every motor. Use at the end of an auto or in an emergency. */
+    public void stopAll() {
+        intake1.setPower(0);
+        intake2.setPower(0);
+        shooter1.setVelocity(0);
+        shooter2.setVelocity(0);
+    }
+
+    /** Scales a motor power so it acts the same at low battery. */
+    public double voltageComp(double power) { return power * 12.0 / voltage; }
+
+    public double amps(DcMotorEx motor) { return motor.getCurrent(CurrentUnit.AMPS); }
+
 }
