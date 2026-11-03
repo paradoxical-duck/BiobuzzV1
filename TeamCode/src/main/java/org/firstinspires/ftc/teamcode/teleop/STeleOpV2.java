@@ -56,10 +56,6 @@ public class STeleOpV2 extends LinearOpMode {
         intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 
-
-        trackingSS = new TrackingSS(robot, follower, RobotHardware.alliance);
-        colorSS = new ColorSS(robot, RobotHardware.alliance);
-
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
 
@@ -69,8 +65,6 @@ public class STeleOpV2 extends LinearOpMode {
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
 
         ballCount = 0;
-
-        colorSS.reset();
 
         while (opModeInInit()) {
             if (gamepad1.left_bumper && !lastLB) {
@@ -96,8 +90,13 @@ public class STeleOpV2 extends LinearOpMode {
             telemetry.update();
         }
 
-
+        if (isStopRequested()) return;
+        trackingSS = new TrackingSS(robot, follower, RobotHardware.alliance);
+        colorSS = new ColorSS(robot, RobotHardware.alliance);
+        colorSS.reset();
         waitForStart();
+        if (isStopRequested()) return;
+        robot.clearBulkCache();
 
         lastFrontBeam = robot.frontBeam.getState();
 
@@ -106,6 +105,8 @@ public class STeleOpV2 extends LinearOpMode {
         }
 
         while (opModeIsActive()) {
+            robot.clearBulkCache();
+            robot.applyShooterPIDF();
             follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
             follower.update();
             colorSS.update(ballCount);
@@ -264,21 +265,24 @@ public class STeleOpV2 extends LinearOpMode {
                 telemetry.addLine("");
                 telemetry.addLine("***Shooter***");
                 telemetry.addData("Shooter state", shooterSS.getPollenShooterState() + " / " + shooterSS.getNectarShooterState());
-                telemetry.addData("Target velocity", TrackingSS.getTargetRpm());
+                telemetry.addData("Target velocity pollen", TrackingSS.getTargetRpmPollen());
+                telemetry.addData("Target velocity nectar", TrackingSS.getTargetRpmNectar());
                 telemetry.addData("Shooter 1 velocity", robot.shooter1.getVelocity());
                 telemetry.addData("Shooter 2 velocity", robot.shooter2.getVelocity());
 
                 telemetry.addLine("");
                 telemetry.addLine("***Hood***");
                 telemetry.addData("Hood state", shooterSS.getPollenHoodState() + " / " + shooterSS.getNectarHoodState());
-                telemetry.addData("Target hood", TrackingSS.getTargetHood());
+                telemetry.addData("Target hood pollen", TrackingSS.getTargetHoodPollen());
+                telemetry.addData("Target hood nectar", TrackingSS.getTargetHoodNectar());
                 telemetry.addData("Hood position", robot.hood1.getPosition() + " / " + robot.hood2.getPosition());
 
                 telemetry.addLine("");
                 telemetry.addLine("***Turret***");
                 telemetry.addData("Turret state", shooterSS.getPollenTurretState() + " / " + shooterSS.getNectarTurretState());
                 telemetry.addData("Turret position", robot.turret1.getPosition() + " / " + robot.turret2.getPosition());
-                telemetry.addData("Turret angle", TrackingSS.getTurret());
+                telemetry.addData("Turret angle pollen", TrackingSS.getPollenTurret());
+                telemetry.addData("Turret angle nectar", TrackingSS.getNectarTurret());
 
                 telemetry.addLine("");
                 telemetry.addLine("***Interpolation***");

@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.math.Pose;
 
 @Configurable
+@Config
 public class Globals {
     public static double intakeOn = 1;
     public static double intakeOff = 0;

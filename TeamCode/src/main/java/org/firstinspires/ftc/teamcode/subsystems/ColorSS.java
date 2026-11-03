@@ -2,13 +2,15 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import android.graphics.Color;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 public class ColorSS {
-    RobotHardware robot = RobotHardware.getInstance();
+    RobotHardware robot;
+    private RevColorSensorV3 colorSensor;
     RobotHardware.Alliance alliance;
 
     public enum GameElements {POLLEN, NECTAR, NULL}
@@ -25,11 +27,17 @@ public class ColorSS {
 
     public ColorSS(RobotHardware robot, RobotHardware.Alliance alliance) {
         this.robot = robot;
+        this.colorSensor = robot.colorSensor;
         this.alliance = alliance;
     }
 
+    public ColorSS(RevColorSensorV3 colorSensor, boolean red) {
+        this.colorSensor = colorSensor;
+        this.alliance = red ? RobotHardware.Alliance.RED : RobotHardware.Alliance.BLUE;
+    }
+
     public void update(int ballCount) {
-        distanceCm = robot.colorSensor.getDistance(DistanceUnit.CM);
+        distanceCm = colorSensor.getDistance(DistanceUnit.CM);
 
         if (ballCount > 0 && ballCount <= 4 && !robot.frontBeam.getState() && distanceCm <= Globals.colorMaxDistanceCm) {
             GameElements element = detectElement();
@@ -62,9 +70,9 @@ public class ColorSS {
     }
 
     public GameElements detectElement() {
-        int r = robot.colorSensor.red();
-        int g = robot.colorSensor.green();
-        int b = robot.colorSensor.blue();
+        int r = colorSensor.red();
+        int g = colorSensor.green();
+        int b = colorSensor.blue();
 
         int max = Math.max(r, Math.max(g, b));
 

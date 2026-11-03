@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.util.Range;
@@ -7,9 +8,10 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
+@Config
 public class TrackingSS {
-    public static RobotHardware robot = RobotHardware.getInstance();
-    public static Follower follower;
+    private static RobotHardware robot;
+    private static Follower follower;
     public static RobotHardware.Alliance alliance;
     public static double dy = 0;
     public static double dx = 0;
@@ -56,6 +58,11 @@ public class TrackingSS {
         TrackingSS.robot = robot;
         TrackingSS.follower = follower;
         TrackingSS.alliance = alliance;
+    }
+
+    public TrackingSS(Follower follower, boolean red) {
+        TrackingSS.follower = follower;
+        TrackingSS.alliance = red ? RobotHardware.Alliance.RED : RobotHardware.Alliance.BLUE;
     }
 
     public static void setDxAndDy() {
@@ -255,6 +262,8 @@ public class TrackingSS {
     }
 
     public static void updateTracking(ShooterSS shooterSS) {
+        currentPollen = robot.turret1.getPosition();
+        currentNectar = robot.turret2.getPosition();
         shooterSS.setPollenTurretTarget(getPollenTurretPos());
         shooterSS.setNectarTurretTarget(getNectarTurretPos());
 

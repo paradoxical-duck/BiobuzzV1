@@ -27,6 +27,9 @@ public class RedDownSolo3 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
+        RobotHardware.alliance = RobotHardware.Alliance.RED;
+        intakeSS = new IntakeSS(robot);
+        shooterSS = new ShooterSS(robot);
 
         path = new RedDownSolo3Path();
         follower = Constants.create(hardwareMap);
@@ -38,6 +41,7 @@ public class RedDownSolo3 extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            robot.clearBulkCache();
             follower.update();
             if (!scheduled) {
                 schedule(path.autoRoutine(follower, intakeSS, shooterSS));
