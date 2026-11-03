@@ -30,29 +30,33 @@ public class ShooterSSTuning extends LinearOpMode {
     Servo hood2;
     @Override
     public void runOpMode() throws InterruptedException {
+
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+
         turret1 = hardwareMap.get(Servo.class, "turret1");
-        hood1 = hardwareMap.get(Servo.class, "hood1");
         turret2 = hardwareMap.get(Servo.class, "turret2");
+
+        hood1 = hardwareMap.get(Servo.class, "hood1");
         hood2 = hardwareMap.get(Servo.class, "hood2");
+
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         waitForStart();
 
         while (opModeIsActive()) {
-
             shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);
             shooter2.setVelocityPIDFCoefficients(Globals.kP_Nectar, Globals.kI_Nectar, Globals.kD_Nectar, Globals.kF_Nectar);
 
-
             shooter1.setVelocity(shooter1Vel);
             turret1.setPosition(turret1Pos);
-            hood1.setPosition(hood1Pos);
 
+            hood1.setPosition(hood1Pos);
 
             shooter2.setVelocity(shooter2Vel);
             turret2.setPosition(turret2Pos);
