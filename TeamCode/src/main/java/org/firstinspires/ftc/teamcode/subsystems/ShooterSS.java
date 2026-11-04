@@ -207,20 +207,20 @@ public class ShooterSS {
 
         switch (newState) {
             case UNLOCKED:
-                target1 = Globals.unlocked;
-                target2 = Globals.unlocked;
+                target1 = Globals.feedLock1Open;
+                target2 = Globals.feedLock1Open;
                 break;
             case LOCKED:
-                target1 = Globals.locked;
-                target2 = Globals.locked;
+                target1 = Globals.feedLock1Close;
+                target2 = Globals.feedLock2Close;
                 break;
             case NECTAR_UNLOCKED:
-                target1 = Globals.locked;
-                target2 = Globals.unlocked;
+                target1 = Globals.feedLock1Close;
+                target2 = Globals.feedLock2Open;
                 break;
             case POLLEN_UNLOCKED:
-                target1 = Globals.unlocked;
-                target2 = Globals.locked;
+                target1 = Globals.feedLock1Open;
+                target2 = Globals.feedLock2Close;
                 break;
         }
 

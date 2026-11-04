@@ -1,46 +1,48 @@
 package org.firstinspires.ftc.teamcode.versionTesting.driveSS;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @TeleOp(group = "Version Testing")
 @Config
 public class DriveTestV1 extends LinearOpMode {
-    DcMotorEx m1;
-    DcMotorEx m2;
-    DcMotorEx m3;
-    DcMotorEx m4;
-    public static double m1Power = 0;
-    public static double m2Power = 0;
-    public static double m3Power = 0;
-    public static double m4Power = 0;
+    Follower follower;
+    DcMotorEx lf;
+    DcMotorEx rf;
+    DcMotorEx lb;
+    DcMotorEx rb;
     @Override
     public void runOpMode() throws InterruptedException {
-        m1 = hardwareMap.get(DcMotorEx.class, "m1");
-        m3 = hardwareMap.get(DcMotorEx.class, "m2");
-        m2 = hardwareMap.get(DcMotorEx.class, "m3");
-        m4 = hardwareMap.get(DcMotorEx.class, "m4");
-
-
+        follower = Constants.create(hardwareMap);
+        lf = hardwareMap.get(DcMotorEx.class, Constants.drivetrainConfig.frontLeftName.get());
+        rf = hardwareMap.get(DcMotorEx.class, Constants.drivetrainConfig.frontRightName.get());
+        lb = hardwareMap.get(DcMotorEx.class, Constants.drivetrainConfig.backLeftName.get());
+        rb = hardwareMap.get(DcMotorEx.class, Constants.drivetrainConfig.backRightName.get());
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
-
         while (opModeIsActive()) {
-            m1.setPower(m1Power);
-            m3.setPower(m2Power);
-            m2.setPower(m3Power);
-            m4.setPower(m4Power);
+            follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            follower.update();
 
-            telemetry.addData("m1 current", m1.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("m2 current", m3.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("m3 current", m2.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("m4 current", m4.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("LF velocity", lf.getVelocity());
+            telemetry.addData("LF current", lf.getCurrent(CurrentUnit.AMPS));
+
+            telemetry.addData("RF velocity", rf.getVelocity());
+            telemetry.addData("RF current", rf.getCurrent(CurrentUnit.AMPS));
+
+            telemetry.addData("LB velocity", lb.getVelocity());
+            telemetry.addData("LB current", lb.getCurrent(CurrentUnit.AMPS));
+
+            telemetry.addData("RB velocity", rb.getVelocity());
+            telemetry.addData("RB current", rb.getCurrent(CurrentUnit.AMPS));
             telemetry.update();
         }
     }

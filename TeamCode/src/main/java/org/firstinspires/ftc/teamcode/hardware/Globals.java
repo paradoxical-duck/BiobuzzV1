@@ -46,9 +46,12 @@ public class Globals {
     public static double intakeDeployInit = 0.5;
     //todo TUNE^^^^^^^^^^
 
-    //todo shooter lock poses
-    public static double locked = 0.5;
-    public static double unlocked = 0.5;
+    //todo shooter lock poses POLLEN
+    public static double feedLock1Open = 0.5;
+    public static double feedLock1Close = 0.5;
+    //todo shooter lock poses NECTAR
+    public static double feedLock2Open = 0.5;
+    public static double feedLock2Close = 0.5;
     //todo tune
     public static double shootDelayMs = 500; //todo figure out actual delay
     public static double shootRevDelayMs = 250; //todo figure out
