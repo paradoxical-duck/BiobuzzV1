@@ -9,14 +9,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 @TeleOp(group = "Version Testing")
-@Config
 public class IntakeDeployTestV1 extends LinearOpMode {
     public static double intakeDeployPos = 0;
     Servo intakeDeploy;
     @Override
     public void runOpMode() throws InterruptedException {
         intakeDeploy = hardwareMap.get(Servo.class, "intakeDeploy");
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         while (opModeIsActive()) {
             intakeDeploy.setPosition(intakeDeployPos);

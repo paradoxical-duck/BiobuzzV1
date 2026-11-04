@@ -1,11 +1,8 @@
 
 package org.firstinspires.ftc.teamcode.versionTesting.trackingSS;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -19,7 +16,6 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
 @TeleOp(group = "Version Testing")
-@Config
 //todo tune TrackingSS values while running this
 public class TrackingTestV1 extends LinearOpMode {
     TrackingSS trackingSS;
@@ -86,7 +82,6 @@ public class TrackingTestV1 extends LinearOpMode {
 
         trackingSS = new TrackingSS(follower, red);
 
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
 
         while (opModeIsActive()) {

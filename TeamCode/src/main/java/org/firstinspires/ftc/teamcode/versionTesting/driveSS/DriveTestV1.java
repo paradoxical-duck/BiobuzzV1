@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.versionTesting.driveSS;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,7 +9,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @TeleOp(group = "Version Testing")
-@Config
 public class DriveTestV1 extends LinearOpMode {
     Follower follower;
     DcMotorEx lf;
@@ -26,7 +22,6 @@ public class DriveTestV1 extends LinearOpMode {
         rf = hardwareMap.get(DcMotorEx.class, Constants.drivetrainConfig.frontRightName.get());
         lb = hardwareMap.get(DcMotorEx.class, Constants.drivetrainConfig.backLeftName.get());
         rb = hardwareMap.get(DcMotorEx.class, Constants.drivetrainConfig.backRightName.get());
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         while (opModeIsActive()) {
             follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);

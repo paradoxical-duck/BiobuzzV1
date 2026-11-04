@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.versionTesting.shooterSS;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
-@Config
 @TeleOp(group = "Version Testing")
 public class LockTestV1 extends LinearOpMode {
     public static double lock1Pos = 0;
@@ -19,7 +15,6 @@ public class LockTestV1 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         feedLock1 = hardwareMap.get(Servo.class, "feedLock1");
         feedLock2 = hardwareMap.get(Servo.class, "feedLock2");
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         while (opModeIsActive()) {
             feedLock1.setPosition(lock1Pos);

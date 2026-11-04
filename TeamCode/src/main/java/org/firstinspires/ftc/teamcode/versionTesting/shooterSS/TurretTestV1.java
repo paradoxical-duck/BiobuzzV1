@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.versionTesting.shooterSS;
 
 import com.qualcomm.robotcore.hardware.Servo;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 @TeleOp
-@Config
 public class TurretTestV1 extends LinearOpMode {
     boolean lastRB = false;
     boolean lastLB = false;
@@ -17,7 +13,6 @@ public class TurretTestV1 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         turret1 = hardwareMap.get(Servo.class, "turret1");
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
 
         while (opModeIsActive()) {

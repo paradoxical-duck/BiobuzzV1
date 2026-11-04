@@ -1,18 +1,15 @@
 package org.firstinspires.ftc.teamcode.versionTesting.shooterSS;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 
-@Config
 @TeleOp(group = "Version Testing")
+//TODO - REMAKE WITH GAMEPAD TUNING (WILL BE DIFFICULT AS LOTS IS TO BE TUNED AND NOT MANY BUTTONS)
 public class ShooterTestV1 extends LinearOpMode {
     public static double shooter1Vel = 0;
     public static double shooter2Vel = 0;
@@ -26,7 +23,6 @@ public class ShooterTestV1 extends LinearOpMode {
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         while (opModeIsActive()) {
             shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);

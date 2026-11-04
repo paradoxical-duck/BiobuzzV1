@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode.versionTesting.colorSS;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.ColorSS;
 
 @TeleOp(group = "Version Testing")
-@Config
 public class ColorTestV1 extends LinearOpMode {
     ColorSS colorSS;
 
@@ -20,7 +16,6 @@ public class ColorTestV1 extends LinearOpMode {
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "color sensor");
         colorSS = new ColorSS(colorSensor, true);
 
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
 
         while (opModeIsActive()) {

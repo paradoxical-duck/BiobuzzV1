@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
-@TeleOp(name = "Para Tele V2 💛")
+@TeleOp(name = "Para Tele V2")
 @Configurable
 public class STeleOpV2 extends LinearOpMode {
     IntakeSS intakeSS;
