@@ -1,7 +1,6 @@
 
 package org.firstinspires.ftc.teamcode.teleop;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,7 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
 @TeleOp(name = "Para Tele V1")
-@Configurable
 public class STeleOpV1 extends LinearOpMode {
     IntakeSS intakeSS;
     ShooterSS shooterSS;

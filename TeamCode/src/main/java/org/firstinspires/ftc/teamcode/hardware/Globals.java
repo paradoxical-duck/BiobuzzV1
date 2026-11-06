@@ -1,11 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware;
-
-import com.bylazar.configurables.annotations.Configurable;
-import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.math.Pose;
 
-@Configurable
-@Config
 public class Globals {
 
     //todo intake

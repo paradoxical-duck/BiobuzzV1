@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode.auto.red;
+package org.firstinspires.ftc.teamcode.auto.blue;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 
@@ -8,7 +8,7 @@ import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.auto.paths.BlueUpSolo3Path;
+import org.firstinspires.ftc.teamcode.auto.paths.blue.BlueUpSolo3Path;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;

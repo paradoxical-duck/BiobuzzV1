@@ -59,4 +59,10 @@ public class IntakeSS {
     public FlowerRampState getFlowerRampState() {
         return flowerRampState;
     }
+    public boolean isEmpty() {
+        return robot.frontBeam.getState() &&
+                robot.pollenBeam.getState() &&
+                robot.nectarBeam.getState() &&
+                robot.midBeam.getState();
+    }
 }
