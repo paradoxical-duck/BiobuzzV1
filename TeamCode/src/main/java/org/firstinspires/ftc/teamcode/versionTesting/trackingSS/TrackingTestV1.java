@@ -1,221 +1,161 @@
-
 package org.firstinspires.ftc.teamcode.versionTesting.trackingSS;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.hardware.Globals;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
 @TeleOp(group = "Version Testing")
-//todo tune TrackingSS values while running this
 public class TrackingTestV1 extends LinearOpMode {
-    TrackingSS trackingSS;
-    DcMotorEx shooter1;
-    DcMotorEx shooter2;
-    Servo turret1;
-    Servo turret2;
-    Servo hood1;
-    Servo hood2;
     Follower follower;
-    String alliance = "RED";
-    ShooterSS.TurretState turretState = ShooterSS.TurretState.TRACKING_DISABLED;
-    ShooterSS.ShooterState shooterState = ShooterSS.ShooterState.INTERPOL_DISABLED;
-    ShooterSS.HoodState hoodState = ShooterSS.HoodState.INTERPOL_DISABLED;
-    boolean lastLB = false;
-    boolean red = true;
-    boolean lastStart = false;
-    boolean lastBack = false;
-    boolean lastRB = false;
+    DcMotorEx shooter1, shooter2;
+    Servo turret1, turret2, hood1, hood2;
+    boolean red = true, trackingEnabled = false, interpolEnabled = false, shooterEnabled = false;
+    boolean lastLB, lastRB, lastStart, lastBack, lastLeft, lastRight, lastUp, lastDown, lastA, lastB, lastX;
+    boolean fine = false;
+    int selected = 0;
+    double driveScale = 0.3;
     public static Pose startPose = new Pose(0, 0, 0);
-    public static boolean trackingEnabled = false, interpolEnabled = false, shooterEnabled = false;
+    String[] labels = {"Pollen base RPM", "Nectar base RPM", "Pollen base hood", "Nectar base hood", "Pollen RPM/in", "Nectar RPM/in", "Pollen hood/in", "Nectar hood/in", "Pollen turret offset deg", "Nectar turret offset deg", "Pollen turret kP", "Nectar turret kP", "Pollen turret kS", "Nectar turret kS"};
+
+    double getValue(int index) {
+        switch (index) {
+            case 0: return Globals.shooterOnPollen;
+            case 1: return Globals.shooterOnNectar;
+            case 2: return Globals.hoodShootPosPollen;
+            case 3: return Globals.hoodShootPosNectar;
+            case 4: return TrackingSS.rpmPerInchPollen;
+            case 5: return TrackingSS.rpmPerInchNectar;
+            case 6: return TrackingSS.hoodPerInchPollen;
+            case 7: return TrackingSS.hoodPerInchNectar;
+            case 8: return Globals.turretOffsetPollen;
+            case 9: return Globals.turretOffsetNectar;
+            case 10: return TrackingSS.kP_Pollen;
+            case 11: return TrackingSS.kP_Nectar;
+            case 12: return TrackingSS.kS_Pollen;
+            default: return TrackingSS.kS_Nectar;
+        }
+    }
+
+    void setValue(int index, double value) {
+        switch (index) {
+            case 0: Globals.shooterOnPollen = Math.max(0, value); break;
+            case 1: Globals.shooterOnNectar = Math.max(0, value); break;
+            case 2: Globals.hoodShootPosPollen = Range.clip(value, 0, 1); break;
+            case 3: Globals.hoodShootPosNectar = Range.clip(value, 0, 1); break;
+            case 4: TrackingSS.rpmPerInchPollen = value; break;
+            case 5: TrackingSS.rpmPerInchNectar = value; break;
+            case 6: TrackingSS.hoodPerInchPollen = value; break;
+            case 7: TrackingSS.hoodPerInchNectar = value; break;
+            case 8: Globals.turretOffsetPollen = value; break;
+            case 9: Globals.turretOffsetNectar = value; break;
+            case 10: TrackingSS.kP_Pollen = Math.max(0, value); break;
+            case 11: TrackingSS.kP_Nectar = Math.max(0, value); break;
+            case 12: TrackingSS.kS_Pollen = Math.max(0, value); break;
+            case 13: TrackingSS.kS_Nectar = Math.max(0, value); break;
+        }
+    }
+
+    double getStep() {
+        if (selected < 2) return fine ? 10 : 50;
+        if (selected < 4) return fine ? 0.001 : 0.01;
+        if (selected < 6) return fine ? 0.1 : 1;
+        if (selected < 8) return fine ? 0.0001 : 0.001;
+        if (selected < 10) return fine ? 0.1 : 1;
+        return fine ? 0.0001 : 0.001;
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
-
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-
         turret1 = hardwareMap.get(Servo.class, "turret1");
         turret2 = hardwareMap.get(Servo.class, "turret2");
-
         hood1 = hardwareMap.get(Servo.class, "hood1");
         hood2 = hardwareMap.get(Servo.class, "hood2");
-
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
-
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);
         shooter2.setVelocityPIDFCoefficients(Globals.kP_Nectar, Globals.kI_Nectar, Globals.kD_Nectar, Globals.kF_Nectar);
-
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
-
+        TrackingSS.currentPollen = turret1.getPosition();
+        TrackingSS.currentNectar = turret2.getPosition();
         while (opModeInInit()) {
-            if (gamepad1.left_bumper && !lastLB) {
-                red = !red;
-            }
+            if (gamepad1.left_bumper && !lastLB) red = !red;
             lastLB = gamepad1.left_bumper;
-
-            if (red) {
-                alliance = "RED";
-            }
-            else {
-                alliance = "BLUE";
-            }
-
-            telemetry.addLine("Initialized");
-            telemetry.addLine(alliance + " alliance active");
+            telemetry.addLine("INIT: LB toggles RED/BLUE | Drive requires RIGHT TRIGGER held when running");
+            telemetry.addData("Alliance", red ? "RED" : "BLUE");
             telemetry.update();
+            idle();
         }
-
-        trackingSS = new TrackingSS(follower, red);
-
-        waitForStart();
-
-        while (opModeIsActive()) {
-            follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-            follower.update();
-
-            if (gamepad1.start && !lastStart) {
-                trackingEnabled = !trackingEnabled;
-
+        if (isStopRequested()) return;
+        new TrackingSS(follower, red);
+        lastLB = gamepad1.left_bumper;
+        try {
+            while (opModeIsActive()) {
+                double power = gamepad1.right_trigger > 0.5 ? driveScale : 0;
+                follower.manual(-gamepad1.left_stick_y * power, gamepad1.left_stick_x * power, gamepad1.right_stick_x * power);
+                follower.update();
+                if (gamepad1.start && !lastStart) trackingEnabled = !trackingEnabled;
+                if (gamepad1.back && !lastBack) interpolEnabled = !interpolEnabled;
+                if (gamepad1.right_bumper && !lastRB) shooterEnabled = !shooterEnabled;
+                if (gamepad1.dpad_left && !lastLeft) selected = (selected + labels.length - 1) % labels.length;
+                if (gamepad1.dpad_right && !lastRight) selected = (selected + 1) % labels.length;
+                if (gamepad1.a && !lastA) fine = false;
+                if (gamepad1.b && !lastB) fine = true;
+                if (gamepad1.dpad_up && !lastUp) setValue(selected, getValue(selected) + getStep());
+                if (gamepad1.dpad_down && !lastDown) setValue(selected, getValue(selected) - getStep());
+                if (gamepad1.x && !lastX) shooterEnabled = false;
+                lastStart = gamepad1.start; lastBack = gamepad1.back; lastRB = gamepad1.right_bumper;
+                lastLeft = gamepad1.dpad_left; lastRight = gamepad1.dpad_right;
+                lastA = gamepad1.a; lastB = gamepad1.b;
+                lastUp = gamepad1.dpad_up; lastDown = gamepad1.dpad_down;
+                lastX = gamepad1.x;
                 if (trackingEnabled) {
-                    turret1.setPosition(TrackingSS.getTurretPos());
-                    turret2.setPosition(turret1.getPosition());
-                    turretState = ShooterSS.TurretState.TRACKING_ENABLED;
+                    TrackingSS.currentPollen = turret1.getPosition();
+                    TrackingSS.currentNectar = turret2.getPosition();
+                    turret1.setPosition(TrackingSS.getPollenTurretPos());
+                    turret2.setPosition(TrackingSS.getNectarTurretPos());
                 }
-                else {
-                    turretState = ShooterSS.TurretState.TRACKING_DISABLED;
-                }
-            }
-            lastStart = gamepad1.start;
-
-            if (gamepad1.back && !lastBack) {
-                interpolEnabled = !interpolEnabled;
-
-                if (interpolEnabled) {
-                    TrackingSS.interpolate();
-                    hood1.setPosition(TrackingSS.getTargetHood());
-                    hood2.setPosition(TrackingSS.getTargetHood());
-                    if (shooterState == ShooterSS.ShooterState.INTERPOLATED) {
-                        shooter1.setVelocity(TrackingSS.getTargetRpm());
-                        shooter2.setVelocity(TrackingSS.getTargetRpm());
-                    }
-                    hoodState = ShooterSS.HoodState.INTERPOLATED;
-
-                    if (shooterEnabled) {
-                        shooter1.setVelocity(TrackingSS.getTargetRpm());
-                        shooter2.setVelocity(TrackingSS.getTargetRpm());
-                        shooterState = ShooterSS.ShooterState.INTERPOLATED;
-                    }
-                }
-                else {
-                    hood1.setPosition(Globals.hoodShootPosPollen);
-                    hood2.setPosition(Globals.hoodShootPosNectar);
-                    hoodState = ShooterSS.HoodState.SHOOT;
-
-                    if (shooterEnabled) {
-                        shooter1.setVelocity(Globals.shooterOnPollen);
-                        shooter2.setVelocity(Globals.shooterOnNectar);
-                        shooterState = ShooterSS.ShooterState.INTERPOL_DISABLED;
-                    }
-                }
-            }
-            lastBack = gamepad1.back;
-
-            if (gamepad1.right_bumper && !lastRB) {
-                shooterEnabled = !shooterEnabled;
-
-                if (!shooterEnabled) {
-                    shooter1.setVelocity(Globals.shooterInit);
-                    shooter2.setVelocity(Globals.shooterInit);
-                    shooterState = ShooterSS.ShooterState.INIT;
-                }
-                else if (interpolEnabled) {
-                    shooter1.setVelocity(TrackingSS.getTargetRpm());
-                    shooter2.setVelocity(TrackingSS.getTargetRpm());
-                    shooterState = ShooterSS.ShooterState.INTERPOLATED;
-                }
-                else {
-                    shooter1.setVelocity(Globals.shooterOnPollen);
-                    shooter2.setVelocity(Globals.shooterOnNectar);
-                    shooterState = ShooterSS.ShooterState.INTERPOL_DISABLED;
-                }
-            }
-            lastRB = gamepad1.right_bumper;
-
-            if (trackingEnabled) {
-                turret1.setPosition(TrackingSS.getTurretPos());
-                turret2.setPosition(turret1.getPosition());
-            }
-
-            if (interpolEnabled) {
                 TrackingSS.interpolate();
-                hood1.setPosition(TrackingSS.getTargetHood());
-                hood2.setPosition(TrackingSS.getTargetHood());
-
-                if (shooterEnabled) {
-                    if (shooterState == ShooterSS.ShooterState.INTERPOLATED) {
-                        shooter1.setVelocity(TrackingSS.getTargetRpm());
-                        shooter2.setVelocity(TrackingSS.getTargetRpm());
-                    }
-                }
+                hood1.setPosition(interpolEnabled ? TrackingSS.getTargetHoodPollen() : Globals.hoodShootPosPollen);
+                hood2.setPosition(interpolEnabled ? TrackingSS.getTargetHoodNectar() : Globals.hoodShootPosNectar);
+                shooter1.setVelocity(shooterEnabled ? (interpolEnabled ? TrackingSS.getTargetRpmPollen() : Globals.shooterOnPollen) : 0);
+                shooter2.setVelocity(shooterEnabled ? (interpolEnabled ? TrackingSS.getTargetRpmNectar() : Globals.shooterOnNectar) : 0);
+                telemetry.addLine("INIT LB: alliance | START: turret tracking | BACK: interpolation | RB: shooters toggle | X: SHOOTERS OFF");
+                telemetry.addLine("LEFT/RIGHT: parameter | UP/DOWN: +/- | A: coarse | B: fine | Hold RT: drive (30%)");
+                telemetry.addData("Alliance", red ? "RED" : "BLUE");
+                telemetry.addData("Turret tracking", trackingEnabled);
+                telemetry.addData("Interpolation", interpolEnabled);
+                telemetry.addData("Shooters enabled", shooterEnabled);
+                telemetry.addData("Selected parameter", labels[selected]);
+                telemetry.addData("Parameter value", getValue(selected));
+                telemetry.addData("Step", getStep());
+                telemetry.addData("Robot pose x/y/deg", "%.2f / %.2f / %.2f", follower.pose().x(), follower.pose().y(), Math.toDegrees(follower.pose().heading()));
+                telemetry.addData("Pollen turret/angle", "%.5f / %.2f", turret1.getPosition(), TrackingSS.getPollenTurret());
+                telemetry.addData("Nectar turret/angle", "%.5f / %.2f", turret2.getPosition(), TrackingSS.getNectarTurret());
+                telemetry.addData("Pollen target/actual ticks/s", "%.1f / %.1f", shooterEnabled ? (interpolEnabled ? TrackingSS.getTargetRpmPollen() : Globals.shooterOnPollen) : 0, shooter1.getVelocity());
+                telemetry.addData("Nectar target/actual ticks/s", "%.1f / %.1f", shooterEnabled ? (interpolEnabled ? TrackingSS.getTargetRpmNectar() : Globals.shooterOnNectar) : 0, shooter2.getVelocity());
+                telemetry.addData("Pollen hood", hood1.getPosition());
+                telemetry.addData("Nectar hood", hood2.getPosition());
+                telemetry.addData("Distance / reference", "%.2f / %.2f", TrackingSS.rangeVal, TrackingSS.referenceDist);
+                telemetry.update();
+                idle();
             }
-
-            //*************************** telemetry ********************************
-            telemetry.addData("Alliance", alliance);
-            telemetry.addData("Turret tracking", trackingEnabled);
-            telemetry.addData("Interpolation", interpolEnabled);
-            telemetry.addData("Shooter enabled", shooterEnabled);
-
-            telemetry.addLine("");
-            telemetry.addLine("***Robot pose***");
-            telemetry.addData("x", follower.pose().x());
-            telemetry.addData("y", follower.pose().y());
-            telemetry.addData("heading", Math.toDegrees(follower.pose().heading()));
-
-            telemetry.addLine("");
-            telemetry.addLine("***Turret***");
-            telemetry.addData("Turret state", turretState + " / " + turretState);
-            telemetry.addData("Turret position", turret1.getPosition() + " / " + turret2.getPosition());
-            telemetry.addData("Turret angle", TrackingSS.getTurret());
-            telemetry.addData("Target dx", TrackingSS.dx);
-            telemetry.addData("Target dy", TrackingSS.dy);
-
-            telemetry.addLine("");
-            telemetry.addLine("***Shooter***");
-            telemetry.addData("Shooter state", shooterState + " / " + shooterState);
-            telemetry.addData("Target velocity", TrackingSS.getTargetRpm());
-            telemetry.addData("Shooter 1 velocity", shooter1.getVelocity());
-            telemetry.addData("Shooter 2 velocity", shooter2.getVelocity());
-
-            telemetry.addLine("");
-            telemetry.addLine("***Hood***");
-            telemetry.addData("Hood state", hoodState + " / " + hoodState);
-            telemetry.addData("Target hood", TrackingSS.getTargetHood());
-            telemetry.addData("Hood position", hood1.getPosition() + " / " + hood2.getPosition());
-
-            telemetry.addLine("");
-            telemetry.addLine("***Interpolation***");
-            telemetry.addData("Distance", TrackingSS.rangeVal);
-            telemetry.addData("Reference distance", TrackingSS.referenceDist);
-            telemetry.addData("Distance error", TrackingSS.rangeVal - TrackingSS.referenceDist);
-            telemetry.addData("RPM per inch", TrackingSS.rpmPerInchPollen);
-            telemetry.addData("Hood per inch", TrackingSS.hoodPerInchPollen);
-
-            telemetry.update();
+        } finally {
+            shooter1.setVelocity(0);
+            shooter2.setVelocity(0);
         }
     }
 }
