@@ -27,7 +27,7 @@ public class BlueUpSolo3 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
-        RobotHardware.alliance = RobotHardware.Alliance.BLUE;
+        RobotHardware.setAlliance(RobotHardware.Alliance.BLUE);
         intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 

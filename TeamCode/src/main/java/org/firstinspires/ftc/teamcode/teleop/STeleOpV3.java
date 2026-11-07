@@ -59,15 +59,18 @@ public class STeleOpV3 extends LinearOpMode {
         ballCount = 0;
         robot.applyShooterPIDF();
         while (opModeInInit()) {
+            red = RobotHardware.isRed();
+            //alliance selection carried over from auto but can still be manually changed
             if (gamepad1.left_bumper && !robot.previousGamepad1.left_bumper) {
                 red = !red;
             }
 
+            //since red = RobotHardware.isRed() it is carried over from auto by default, however can be manually changed
             if (red) {
-                RobotHardware.alliance = RobotHardware.Alliance.RED;
+                RobotHardware.setAlliance(RobotHardware.Alliance.RED);
             }
             else {
-                RobotHardware.alliance = RobotHardware.Alliance.BLUE;
+                RobotHardware.setAlliance(RobotHardware.Alliance.BLUE);
             }
 
             if (gamepad1.left_trigger > 0.3 && !(robot.previousGamepad1.left_trigger > 0.3)) {
@@ -75,13 +78,13 @@ public class STeleOpV3 extends LinearOpMode {
             }
 
             telemetry.addLine("Initialized");
-            telemetry.addLine(RobotHardware.alliance + " alliance active");
+            telemetry.addLine(RobotHardware.getAlliance() + " alliance active");
             telemetry.addData("Print data", printData);
             telemetry.update();
         }
 
-        trackingSS = new TrackingSS(robot, follower, RobotHardware.alliance);
-        colorSS = new ColorSS(robot, RobotHardware.alliance);
+        trackingSS = new TrackingSS(robot, follower, RobotHardware.getAlliance());
+        colorSS = new ColorSS(robot, RobotHardware.getAlliance());
         colorSS.reset();
 
         waitForStart();
@@ -233,7 +236,7 @@ public class STeleOpV3 extends LinearOpMode {
                 TrackingSS.updateTracking(shooterSS);
             }
 
-            telemetry.addData("Alliance", RobotHardware.alliance);
+            telemetry.addData("Alliance", RobotHardware.getAlliance());
             telemetry.addData("Tracking", trackingEnabled);
             telemetry.addData("Shooter", shooterEnabled);
             telemetry.addData("Intake", intakeSS.getIntakeState());

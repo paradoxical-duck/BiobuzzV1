@@ -60,6 +60,9 @@ public class RobotHardware {
     public static Alliance getAlliance() {
         return alliance;
     }
+    public static void setAlliance(Alliance newAlliance) {
+        alliance = newAlliance;
+    }
 
     //TODO =====  GAMEPADS (for toggles)  =====
     public final Gamepad currentGamepad1 = new Gamepad();
