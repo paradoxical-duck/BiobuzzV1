@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import android.graphics.Color;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
@@ -24,6 +25,18 @@ public class ColorSS {
     public double saturation = 0;
     public double value = 0;
     public double distanceCm = 0;
+    public double getHue() {
+        return hue;
+    }
+    public double getSaturation() {
+        return saturation;
+    }
+    public double getValue() {
+        return value;
+    }
+    public double getDistance() {
+        return distanceCm;
+    }
 
     public ColorSS(RobotHardware robot, RobotHardware.Alliance alliance) {
         this.robot = robot;
@@ -144,5 +157,20 @@ public class ColorSS {
         ball2 = GameElements.NULL;
         ball3 = GameElements.NULL;
         ball4 = GameElements.NULL;
+    }
+    public void logTelemetry(Telemetry telemetry) {
+        telemetry.addLine("***Color SS***");
+        telemetry.addData("Ball 1", ball1);
+        telemetry.addData("Ball 2", ball2);
+        telemetry.addData("Ball 3", ball3);
+        telemetry.addData("Ball 4", ball4);
+        telemetry.addData("Hue", hue);
+        telemetry.addData("Hue", getHue());
+        telemetry.addData("Saturation", getSaturation());
+        telemetry.addData("Value", getValue());
+        telemetry.addData("Distance (cm)", getDistance());
+    }
+    public void setDistance(double distanceCm) {
+        this.distanceCm = distanceCm;
     }
 }
