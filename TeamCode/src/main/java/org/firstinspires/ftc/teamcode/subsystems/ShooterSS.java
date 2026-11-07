@@ -208,7 +208,7 @@ public class ShooterSS {
         switch (newState) {
             case UNLOCKED:
                 target1 = Globals.feedLock1Open;
-                target2 = Globals.feedLock1Open;
+                target2 = Globals.feedLock2Open;
                 break;
             case LOCKED:
                 target1 = Globals.feedLock1Close;
