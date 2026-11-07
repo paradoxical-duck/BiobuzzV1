@@ -221,7 +221,7 @@ public class STeleOpV3 extends LinearOpMode {
                 isShooting = true;
             }
 
-            if (isShooting && isEmpty()) {
+            if (isShooting && robot.isEmpty()) {
                 shooterSS.updateState(ShooterSS.LockState.LOCKED);
                 isShooting = false;
                 ballCount = 0;
@@ -297,12 +297,5 @@ public class STeleOpV3 extends LinearOpMode {
             telemetry.update();
             robot.previousGamepad1.copy(gamepad1);
         }
-    }
-
-    public boolean isEmpty() {
-        return robot.frontBeam.getState() &&
-                robot.pollenBeam.getState() &&
-                robot.nectarBeam.getState() &&
-                robot.midBeam.getState();
     }
 }

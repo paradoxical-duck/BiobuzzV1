@@ -4,6 +4,7 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.ColorSS;
 
 @TeleOp(group = "Version Testing")
@@ -15,14 +16,14 @@ public class ColorTestV1 extends LinearOpMode {
     @Override
     public void runOpMode() {
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "color sensor");
-        colorSS = new ColorSS(colorSensor, red);
+        colorSS = new ColorSS(colorSensor, RobotHardware.getAlliance());
         telemetry.addLine("X: toggle RED/BLUE alliance | All sensor values update continuously");
         telemetry.update();
         waitForStart();
         while (opModeIsActive()) {
             if (gamepad1.x && !lastX) {
                 red = !red;
-                colorSS = new ColorSS(colorSensor, red);
+                colorSS = new ColorSS(colorSensor, RobotHardware.getAlliance());
             }
             lastX = gamepad1.x;
             colorSS.distanceCm = colorSensor.getDistance(DistanceUnit.CM);

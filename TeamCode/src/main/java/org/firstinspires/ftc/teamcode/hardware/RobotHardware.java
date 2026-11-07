@@ -57,6 +57,9 @@ public class RobotHardware {
 
     public static boolean isRed() { return alliance == Alliance.RED; }
     public static void toggleAlliance() { alliance = isRed() ? Alliance.BLUE : Alliance.RED; }
+    public static Alliance getAlliance() {
+        return alliance;
+    }
 
     //TODO =====  GAMEPADS (for toggles)  =====
     public final Gamepad currentGamepad1 = new Gamepad();
@@ -183,5 +186,10 @@ public class RobotHardware {
     public double voltageComp(double power) { return power * 12.0 / voltage; }
 
     public double amps(DcMotorEx motor) { return motor.getCurrent(CurrentUnit.AMPS); }
-
+    public boolean isEmpty() {
+        return frontBeam.getState() &&
+                pollenBeam.getState() &&
+                nectarBeam.getState() &&
+                midBeam.getState();
+    }
 }

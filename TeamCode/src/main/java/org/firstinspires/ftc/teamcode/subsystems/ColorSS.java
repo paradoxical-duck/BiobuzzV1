@@ -31,9 +31,9 @@ public class ColorSS {
         this.alliance = alliance;
     }
 
-    public ColorSS(RevColorSensorV3 colorSensor, boolean red) {
+    public ColorSS(RevColorSensorV3 colorSensor, RobotHardware.Alliance alliance) {
         this.colorSensor = colorSensor;
-        this.alliance = red ? RobotHardware.Alliance.RED : RobotHardware.Alliance.BLUE;
+        this.alliance = alliance;
     }
 
     public void update(int ballCount) {
