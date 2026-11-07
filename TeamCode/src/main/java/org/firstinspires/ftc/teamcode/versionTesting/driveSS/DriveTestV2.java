@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@TeleOp(group = "Version Testing")
+@TeleOp(name = "Para Drive Test I 💛", group = "AAAAAAAAA")
 public class DriveTestV2 extends LinearOpMode {
     Follower follower;
     DcMotorEx lf;
@@ -25,18 +25,20 @@ public class DriveTestV2 extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            follower.manual(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            follower.update();
+
             telemetry.addData("LF current", amps(lf));
             telemetry.addData("LF power", power(lf));
 
             telemetry.addData("RF current", amps(rf));
-            telemetry.addData("LF power", power(rf));
+            telemetry.addData("RF power", power(rf));
 
             telemetry.addData("LB current", amps(lb));
-            telemetry.addData("LF power", power(lb));
+            telemetry.addData("LB power", power(lb));
 
             telemetry.addData("RB current", amps(rb));
-            telemetry.addData("LF power", power(rb));
+            telemetry.addData("RF power", power(rb));
             telemetry.update();
         }
 
