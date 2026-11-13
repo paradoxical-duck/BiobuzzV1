@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.versionTesting.driveSS;
 
 import com.pedropathing.follower.Follower;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@TeleOp(group = "Version Testing")
+@Disabled
 public class DriveTestV1 extends LinearOpMode {
     Follower follower;
     DcMotorEx lf, rf, lb, rb;

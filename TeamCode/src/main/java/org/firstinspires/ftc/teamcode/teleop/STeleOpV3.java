@@ -6,6 +6,8 @@ import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.hardware.PrintData;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ColorSS;
@@ -72,15 +74,11 @@ public class STeleOpV3 extends LinearOpMode {
             else {
                 RobotHardware.setAlliance(RobotHardware.Alliance.BLUE);
             }
-
-            if (gamepad1.left_trigger > 0.3 && !(robot.previousGamepad1.left_trigger > 0.3)) {
-                printData = !printData;
-            }
-
             telemetry.addLine("Initialized");
             telemetry.addLine(RobotHardware.getAlliance() + " alliance active");
-            telemetry.addData("Print data", printData);
+            PrintData.menu(gamepad1, robot.previousGamepad1, telemetry);
             telemetry.update();
+            robot.previousGamepad1.copy(gamepad1);
         }
 
         trackingSS = new TrackingSS(robot, follower, RobotHardware.getAlliance());
@@ -236,67 +234,7 @@ public class STeleOpV3 extends LinearOpMode {
                 TrackingSS.updateTracking(shooterSS);
             }
 
-            telemetry.addData("Alliance", RobotHardware.getAlliance());
-            telemetry.addData("Tracking", trackingEnabled);
-            telemetry.addData("Shooter", shooterEnabled);
-            telemetry.addData("Intake", intakeSS.getIntakeState());
-            telemetry.addData("Ball count", ballCount);
-
-            if (printData) {
-                telemetry.addLine("");
-                telemetry.addLine("***Robot pose***");
-                telemetry.addData("x", follower.pose().x());
-                telemetry.addData("y", follower.pose().y());
-                telemetry.addData("heading", Math.toDegrees(follower.pose().heading()));
-
-                telemetry.addLine("");
-                telemetry.addLine("***Shooter***");
-                telemetry.addData("Shooter state", shooterSS.getPollenShooterState() + " / " + shooterSS.getNectarShooterState());
-                telemetry.addData("Target velocity pollen", TrackingSS.getTargetRpmPollen());
-                telemetry.addData("Target velocity nectar", TrackingSS.getTargetRpmNectar());
-                telemetry.addData("Shooter 1 velocity", robot.shooter1.getVelocity());
-                telemetry.addData("Shooter 2 velocity", robot.shooter2.getVelocity());
-
-                telemetry.addLine("");
-                telemetry.addLine("***Hood***");
-                telemetry.addData("Hood state", shooterSS.getPollenHoodState() + " / " + shooterSS.getNectarHoodState());
-                telemetry.addData("Target hood pollen", TrackingSS.getTargetHoodPollen());
-                telemetry.addData("Target hood nectar", TrackingSS.getTargetHoodNectar());
-                telemetry.addData("Hood position", robot.hood1.getPosition() + " / " + robot.hood2.getPosition());
-
-                telemetry.addLine("");
-                telemetry.addLine("***Turret***");
-                telemetry.addData("Turret state", shooterSS.getPollenTurretState() + " / " + shooterSS.getNectarTurretState());
-                telemetry.addData("Turret position", robot.turret1.getPosition() + " / " + robot.turret2.getPosition());
-                telemetry.addData("Turret angle pollen", TrackingSS.getPollenTurret());
-                telemetry.addData("Turret angle nectar", TrackingSS.getNectarTurret());
-
-                telemetry.addLine("");
-                telemetry.addLine("***Interpolation***");
-                telemetry.addData("Distance", TrackingSS.rangeVal);
-                telemetry.addData("Reference distance", TrackingSS.referenceDist);
-                telemetry.addData("RPM per inch", TrackingSS.rpmPerInchPollen);
-                telemetry.addData("Hood per inch", TrackingSS.hoodPerInchPollen);
-
-                telemetry.addLine("");
-                telemetry.addLine("***Color sensor***");
-                telemetry.addData("Ball 1", colorSS.ball1);
-                telemetry.addData("Ball 2", colorSS.ball2);
-                telemetry.addData("Ball 3", colorSS.ball3);
-                telemetry.addData("Ball 4", colorSS.ball4);
-                telemetry.addData("Hue", colorSS.hue);
-                telemetry.addData("Saturation", colorSS.saturation);
-                telemetry.addData("Distance cm", colorSS.distanceCm);
-
-                telemetry.addLine("");
-                telemetry.addLine("***Beambreakers***");
-                telemetry.addData("Front", robot.frontBeam.getState());
-                telemetry.addData("Mid", robot.midBeam.getState());
-                telemetry.addData("Pollen", robot.pollenBeam.getState());
-                telemetry.addData("Nectar", robot.nectarBeam.getState());
-                telemetry.addData("Ball count", ballCount);
-            }
-
+            PrintData.print(robot, follower, intakeSS, shooterSS, colorSS, trackingEnabled, shooterEnabled, ballCount, telemetry);
             telemetry.update();
             robot.previousGamepad1.copy(gamepad1);
         }
