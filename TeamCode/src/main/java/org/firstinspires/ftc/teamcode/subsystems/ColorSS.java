@@ -164,7 +164,6 @@ public class ColorSS {
         telemetry.addData("Ball 2", ball2);
         telemetry.addData("Ball 3", ball3);
         telemetry.addData("Ball 4", ball4);
-        telemetry.addData("Hue", hue);
         telemetry.addData("Hue", getHue());
         telemetry.addData("Saturation", getSaturation());
         telemetry.addData("Value", getValue());

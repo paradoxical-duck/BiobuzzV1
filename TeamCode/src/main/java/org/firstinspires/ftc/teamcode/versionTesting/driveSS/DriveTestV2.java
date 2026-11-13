@@ -25,7 +25,7 @@ public class DriveTestV2 extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            follower.manual(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
             follower.update();
 
             telemetry.addData("LF current", amps(lf));
@@ -38,7 +38,7 @@ public class DriveTestV2 extends LinearOpMode {
             telemetry.addData("LB power", power(lb));
 
             telemetry.addData("RB current", amps(rb));
-            telemetry.addData("RF power", power(rb));
+            telemetry.addData("RB power", power(rb));
             telemetry.update();
         }
 

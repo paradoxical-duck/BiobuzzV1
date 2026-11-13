@@ -19,7 +19,7 @@ public class IntakeTestV1 extends LinearOpMode {
     int selected = 0;
     boolean lastUp, lastDown, lastLeft, lastRight, lastA, lastB, lastX, lastY, lastBack;
     Follower follower;
-    boolean lastLB;
+    boolean lastRB;
     @Override
     public void runOpMode() throws InterruptedException {
         intake1 = hardwareMap.get(DcMotorEx.class, "intake1");
@@ -35,7 +35,7 @@ public class IntakeTestV1 extends LinearOpMode {
         waitForStart();
         try {
             while (opModeIsActive()) {
-                follower.manual(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+                follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
                 follower.update();
                 if (gamepad1.dpad_left && !lastLeft) {
                     selected = 0;
@@ -85,7 +85,7 @@ public class IntakeTestV1 extends LinearOpMode {
                         intake2Pwr = -intake2Pwr;
                     }
                 }
-                if (gamepad1.right_bumper && !lastLB) {
+                if (gamepad1.right_bumper && !lastRB) {
                     intake1Pwr = 1;
                     intake2Pwr = 1;
                 }
@@ -99,7 +99,7 @@ public class IntakeTestV1 extends LinearOpMode {
                 lastX = gamepad1.x;
                 lastY = gamepad1.y;
                 lastBack = gamepad1.back;
-                lastLB = gamepad1.right_bumper;
+                lastRB = gamepad1.right_bumper;
 
                 intake1.setPower(intake1Pwr);
                 intake2.setPower(intake2Pwr);
