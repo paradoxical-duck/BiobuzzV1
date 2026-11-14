@@ -43,7 +43,7 @@ public class RedDownSolo3 extends LinearOpMode {
             robot.clearBulkCache();
             follower.update();
             if (!scheduled) {
-                schedule(path.autoRoutine(follower, intakeSS, shooterSS));
+                schedule(path.autoRoutine(follower/*, intakeSS, shooterSS*/));
             }
             scheduled = true;
 

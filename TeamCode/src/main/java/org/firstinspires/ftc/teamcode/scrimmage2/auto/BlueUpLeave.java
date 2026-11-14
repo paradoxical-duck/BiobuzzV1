@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @Autonomous
 public class BlueUpLeave extends LinearOpMode {
@@ -28,6 +29,8 @@ public class BlueUpLeave extends LinearOpMode {
     boolean scheduled = false;
     @Override
     public void runOpMode() throws InterruptedException {
+        follower = Constants.create(hardwareMap);
+        follower.setPose(startPose);
         RobotHardware.setAlliance(RobotHardware.Alliance.BLUE);
         waitForStart();
         while (opModeIsActive()) {

@@ -55,56 +55,56 @@ public class BlueUpSolo3Path {
     }
 
     public Path leave() {
-        return Paths.curve(point6, point7Control1, point7).tangent();
+        return Paths.curve(startPose, point7Control1, point7).tangent();
     }
 
-    public Command autoRoutine(Follower follower, IntakeSS intakeSS, ShooterSS shooterSS) {
+    public Command autoRoutine(Follower follower/*, IntakeSS intakeSS, ShooterSS shooterSS*/) {
         return sequential(
-                //todo init
-                parallel(
-                        instant(()-> shooterSS.updateState(ShooterSS.ShooterState.AUTO)),
-                        instant(()-> intakeSS.updateState(IntakeSS.IntakeState.ON)),
-                        instant(()-> shooterSS.updateState(ShooterSS.HoodState.AUTO)),
-                        instant(()-> shooterSS.updateState(ShooterSS.TurretState.AUTO))
-                ),
-                waitMs(Globals.shootRevDelayMs), //todo delay for the shooter to rev up to req velocity
-
-                //todo unlock and shoot
-                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
-                waitMs(Globals.shootDelayMs),
-
-                parallel(
-                        follow(follower, oppositeFlower()),
-                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
-                        //todo shooter locked during path, unlocks at end
-                ),
-                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED)), //todo flower ramp down for intake
-                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
-                waitMs(2000), //todo this is delay for intake and shoot
-                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
-                parallel(
-                        follow(follower, adjacentFlower()),
-                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
-                        //todo shooter locked while intaking from flower
-                ),
-                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED)),
-                waitMs(1500), //todo this is delay for intake from flower needs tuning
-                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
-                follow(follower, adjacentFlowerShoot()),
-                //todo unlock and shoot
-                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
-                waitMs(Globals.shootDelayMs),
-                parallel(
-                        follow(follower, gardenIntake()),
-                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
-                        //todo locked while intaking from garden
-                ),
-                follow(follower, gardenShoot()),
-                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
-                waitMs(Globals.shootDelayMs),
-
-                instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED)),
-                //todo locked while final intake while leaving^^
+//                //todo init
+//                parallel(
+//                        instant(()-> shooterSS.updateState(ShooterSS.ShooterState.AUTO)),
+//                        instant(()-> intakeSS.updateState(IntakeSS.IntakeState.ON)),
+//                        instant(()-> shooterSS.updateState(ShooterSS.HoodState.AUTO)),
+//                        instant(()-> shooterSS.updateState(ShooterSS.TurretState.AUTO))
+//                ),
+//                waitMs(Globals.shootRevDelayMs), //todo delay for the shooter to rev up to req velocity
+//
+//                //todo unlock and shoot
+//                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
+//                waitMs(Globals.shootDelayMs),
+//
+//                parallel(
+//                        follow(follower, oppositeFlower()),
+//                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
+//                        //todo shooter locked during path, unlocks at end
+//                ),
+//                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED)), //todo flower ramp down for intake
+//                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
+//                waitMs(2000), //todo this is delay for intake and shoot
+//                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
+//                parallel(
+//                        follow(follower, adjacentFlower()),
+//                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
+//                        //todo shooter locked while intaking from flower
+//                ),
+//                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED)),
+//                waitMs(1500), //todo this is delay for intake from flower needs tuning
+//                instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
+//                follow(follower, adjacentFlowerShoot()),
+//                //todo unlock and shoot
+//                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
+//                waitMs(Globals.shootDelayMs),
+//                parallel(
+//                        follow(follower, gardenIntake()),
+//                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
+//                        //todo locked while intaking from garden
+//                ),
+//                follow(follower, gardenShoot()),
+//                instant(()-> shooterSS.updateState(ShooterSS.LockState.UNLOCKED)),
+//                waitMs(Globals.shootDelayMs),
+//
+//                instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED)),
+//                //todo locked while final intake while leaving^^
 
                 follow(follower, leave())
                 //todo leave n park
