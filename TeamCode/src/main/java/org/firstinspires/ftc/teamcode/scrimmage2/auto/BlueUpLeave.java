@@ -13,6 +13,8 @@ import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+
 @Autonomous
 public class BlueUpLeave extends LinearOpMode {
     Follower follower;
@@ -26,6 +28,7 @@ public class BlueUpLeave extends LinearOpMode {
     boolean scheduled = false;
     @Override
     public void runOpMode() throws InterruptedException {
+        RobotHardware.setAlliance(RobotHardware.Alliance.BLUE);
         waitForStart();
         while (opModeIsActive()) {
             follower.update();
