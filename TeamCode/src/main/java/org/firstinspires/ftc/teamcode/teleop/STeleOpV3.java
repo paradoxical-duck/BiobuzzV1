@@ -26,7 +26,6 @@ public class STeleOpV3 extends LinearOpMode {
     public static Pose startPose = new Pose(0, 0, 0);
 
     boolean red = false;
-    boolean printData = false;
     boolean trackingEnabled = false;
     boolean shooterEnabled = false;
     boolean intakeEnabled = false;
