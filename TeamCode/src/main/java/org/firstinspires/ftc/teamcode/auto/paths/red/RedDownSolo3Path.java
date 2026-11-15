@@ -22,7 +22,7 @@ public class RedDownSolo3Path {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    public final Pose startPose = poseFactory.of(63.0235, 9.4674, 90);
+    public final Pose startPose = poseFactory.of(63.0235, 9.4674, 180);
     private final Pose point1 = poseFactory.of(51.4989, 128.2668, 140);
     private final Pose point1Control1 = poseFactory.of(85.2139, 100.1134, 0);
     private final Pose point2Start = poseFactory.of(51.4989, 128.2668, 140);

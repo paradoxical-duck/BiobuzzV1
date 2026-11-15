@@ -18,7 +18,6 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 //todo before auto: GET VALUES FOR AUTO SHOOT TURRET AND HOOD
 public class BlueUpSolo3 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
-
     Follower follower;
     BlueUpSolo3Path path;
     boolean scheduled = false;
@@ -35,20 +34,20 @@ public class BlueUpSolo3 extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(path.startPose);
 
-        while (opModeInInit()) {
-            Scheduler.reset();
-        }
+
+        Scheduler.reset();
         waitForStart();
 
         while (opModeIsActive()) {
             robot.clearBulkCache();
-            follower.update();
+
             if (!scheduled) {
                 schedule(path.autoRoutine(follower/*, intakeSS, shooterSS*/));
+                scheduled = true;
             }
-            scheduled = true;
 
             Scheduler.execute();
+            follower.update();
 
             telemetry.addData("X", follower.pose().x());
             telemetry.addData("Y", follower.pose().y());

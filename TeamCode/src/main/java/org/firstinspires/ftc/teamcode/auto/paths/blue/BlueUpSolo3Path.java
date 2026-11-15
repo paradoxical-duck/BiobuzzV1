@@ -21,7 +21,7 @@ public class BlueUpSolo3Path {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    public final Pose startPose = poseFactory.of(78.4765, 132.0326, 90);
+    public final Pose startPose = poseFactory.of(78.4765, 132.0326, 0);
     private final Pose point1 = poseFactory.of(90.0011, 13.2332, 40);
     private final Pose point1Control1 = poseFactory.of(56.2861, 41.3866, 180);
     private final Pose point2Start = poseFactory.of(90.0011, 13.2332, 40);
@@ -32,7 +32,7 @@ public class BlueUpSolo3Path {
     private final Pose point4 = poseFactory.of(131.6519, 134.1513, 357.7183);
     private final Pose point6 = poseFactory.of(78.4765, 132.0139, 357.7006);
     private final Pose point7 = poseFactory.of(128.1012, 48.793, 82.3947);
-    private final Pose point7Control1 = poseFactory.of(122.7862, 90.0553, 180);
+    private final Pose point7Control1 = poseFactory.of(122.7862, 90.0553, 0);
 
     public Path oppositeFlower() {
         return Paths.curve(startPose, point1Control1, point1).linear(startPose, point1);
