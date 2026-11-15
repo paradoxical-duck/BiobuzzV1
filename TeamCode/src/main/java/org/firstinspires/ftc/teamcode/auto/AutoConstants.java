@@ -15,4 +15,9 @@ public class AutoConstants {
     public static Pose redAllianceAdjFlowerCtrl = poseFactory.of(19.7874, 14.5196, 0);
     public static Pose redDownLeave = poseFactory.of(13.3988, 92.707, 97.6053);
     public static Pose redDownLeaveCtrl = poseFactory.of(18.7138, 51.4447, 0);
+
+    //TODO RED SOLO (2) POSES
+    public static Pose flowerAndShoot = poseFactory.of(53.85, 128.0821, 90);
+    public static Pose flowerAndShootCtrl = poseFactory.of(13.9516, 81.4727, 0);
+    public static Pose redSolo2Leave = poseFactory.of(13.2197, 116.5202, 90);
 }
