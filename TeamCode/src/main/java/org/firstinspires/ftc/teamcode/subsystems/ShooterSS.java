@@ -13,14 +13,19 @@ import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
  */
 public class ShooterSS {
     RobotHardware robot = RobotHardware.getInstance();
+    private boolean autoS3Up = false;
 
     public ShooterSS(RobotHardware robot) {
         this.robot = robot;
         robot.applyShooterPIDF();
     }
 
+    public void setAutoS3Up(boolean up) {
+        autoS3Up = up;
+    }
+
     //todo******** shooter *********
-    public enum ShooterState {INIT, INTERPOL_DISABLED, INTERPOLATED, AUTO}
+    public enum ShooterState {INIT, INTERPOL_DISABLED, INTERPOLATED, AUTO, AUTO_S3}
     ShooterState pollenShooterState = ShooterState.INTERPOL_DISABLED;
     ShooterState nectarShooterState = ShooterState.INTERPOL_DISABLED;
 
@@ -48,7 +53,7 @@ public class ShooterSS {
         setNectarShooterTarget(target);
     }
 
-    private double shooterVelocity(ShooterState state, double interpolatedTarget, double disabledTarget, double autoTarget) {
+    private double shooterVelocity(ShooterState state, double interpolatedTarget, double disabledTarget, double autoTarget, double autoS3Target) {
         switch (state) {
             case INIT:
                 return Globals.shooterInit;
@@ -58,17 +63,31 @@ public class ShooterSS {
                 return interpolatedTarget;
             case AUTO:
                 return autoTarget;
+            case AUTO_S3:
+                return autoS3Target;
         }
         return 0;
     }
 
     public void updatePollenState(ShooterState newState) {
-        robot.shooter1.setVelocity(shooterVelocity(newState, pollenShooterTarget, Globals.shooterOnPollen, Globals.autoShootPollen));
+        robot.shooter1.setVelocity(shooterVelocity(
+                newState,
+                pollenShooterTarget,
+                Globals.shooterOnPollen,
+                Globals.autoShootPollen,
+                autoS3Up ? Globals.pollenShootUp : Globals.pollenShootDown
+        ));
         pollenShooterState = newState;
     }
 
     public void updateNectarState(ShooterState newState) {
-        robot.shooter2.setVelocity(shooterVelocity(newState, nectarShooterTarget, Globals.shooterOnNectar, Globals.autoShootNectar));
+        robot.shooter2.setVelocity(shooterVelocity(
+                newState,
+                nectarShooterTarget,
+                Globals.shooterOnNectar,
+                Globals.autoShootNectar,
+                Globals.shooterOnNectar
+        ));
         nectarShooterState = newState;
     }
 
@@ -78,7 +97,7 @@ public class ShooterSS {
     }
 
     //todo******** turret *********
-    public enum TurretState {INIT, TRACKING_DISABLED, TRACKING_ENABLED, SHOOT, AUTO}
+    public enum TurretState {INIT, TRACKING_DISABLED, TRACKING_ENABLED, SHOOT, AUTO, AUTO_S3}
     TurretState pollenTurretState = TurretState.TRACKING_DISABLED;
     TurretState nectarTurretState = TurretState.TRACKING_DISABLED;
 
@@ -106,7 +125,7 @@ public class ShooterSS {
         setNectarTurretTarget(target);
     }
 
-    private double turretPosition(TurretState state, double trackingTarget, double currentPosition, double shootTarget, double autoTarget) {
+    private double turretPosition(TurretState state, double trackingTarget, double currentPosition, double shootTarget, double autoTarget, double autoS3Target) {
         switch (state) {
             case INIT:
                 return Globals.turretInit;
@@ -118,17 +137,33 @@ public class ShooterSS {
                 return shootTarget;
             case AUTO:
                 return autoTarget;
+            case AUTO_S3:
+                return autoS3Target;
         }
         return currentPosition;
     }
 
     public void updatePollenState(TurretState newState) {
-        robot.turret1.setPosition(turretPosition(newState, pollenTurretTarget, robot.turret1.getPosition(), Globals.turretShootPosPollen, Globals.autoTurretPollen));
+        robot.turret1.setPosition(turretPosition(
+                newState,
+                pollenTurretTarget,
+                robot.turret1.getPosition(),
+                Globals.turretShootPosPollen,
+                Globals.autoTurretPollen,
+                autoS3Up ? Globals.pollenTurretUp : Globals.pollenTurretDown
+        ));
         pollenTurretState = newState;
     }
 
     public void updateNectarState(TurretState newState) {
-        robot.turret2.setPosition(turretPosition(newState, nectarTurretTarget, robot.turret2.getPosition(), Globals.turretShootPosNectar, Globals.autoTurretNectar));
+        robot.turret2.setPosition(turretPosition(
+                newState,
+                nectarTurretTarget,
+                robot.turret2.getPosition(),
+                Globals.turretShootPosNectar,
+                Globals.autoTurretNectar,
+                Globals.turretShootPosNectar
+        ));
         nectarTurretState = newState;
     }
 
@@ -138,7 +173,7 @@ public class ShooterSS {
     }
 
     //todo******** hood *********
-    public enum HoodState {INIT, INTERPOL_DISABLED, INTERPOLATED, SHOOT, AUTO}
+    public enum HoodState {INIT, INTERPOL_DISABLED, INTERPOLATED, SHOOT, AUTO, AUTO_S3}
     public HoodState pollenHoodState = HoodState.INTERPOL_DISABLED;
     public HoodState nectarHoodState = HoodState.INTERPOL_DISABLED;
 
@@ -166,7 +201,7 @@ public class ShooterSS {
         setNectarHoodTarget(target);
     }
 
-    private double hoodPosition(HoodState state, double interpolatedTarget, double currentPosition, double shootTarget, double autoTarget) {
+    private double hoodPosition(HoodState state, double interpolatedTarget, double currentPosition, double shootTarget, double autoTarget, double autoS3Target) {
         switch (state) {
             case INIT:
                 return Globals.hoodInit;
@@ -178,17 +213,33 @@ public class ShooterSS {
                 return shootTarget;
             case AUTO:
                 return autoTarget;
+            case AUTO_S3:
+                return autoS3Target;
         }
         return currentPosition;
     }
 
     public void updatePollenState(HoodState newState) {
-        robot.hood1.setPosition(hoodPosition(newState, pollenHoodTarget, robot.hood1.getPosition(), Globals.hoodShootPosPollen, Globals.autoHoodPollen));
+        robot.hood1.setPosition(hoodPosition(
+                newState,
+                pollenHoodTarget,
+                robot.hood1.getPosition(),
+                Globals.hoodShootPosPollen,
+                Globals.autoHoodPollen,
+                autoS3Up ? Globals.pollenHoodUp : Globals.pollenHoodDown
+        ));
         pollenHoodState = newState;
     }
 
     public void updateNectarState(HoodState newState) {
-        robot.hood2.setPosition(hoodPosition(newState, nectarHoodTarget, robot.hood2.getPosition(), Globals.hoodShootPosNectar, Globals.autoHoodNectar));
+        robot.hood2.setPosition(hoodPosition(
+                newState,
+                nectarHoodTarget,
+                robot.hood2.getPosition(),
+                Globals.hoodShootPosNectar,
+                Globals.autoHoodNectar,
+                Globals.hoodShootPosNectar
+        ));
         nectarHoodState = newState;
     }
 

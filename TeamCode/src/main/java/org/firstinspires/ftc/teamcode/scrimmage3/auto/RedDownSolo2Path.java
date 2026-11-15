@@ -23,56 +23,62 @@ public class RedDownSolo2Path {
 
     public Path flowerAndShoot() {
         return Paths.curve(
-                AutoConstants.redGardenPose, AutoConstants.flowerAndShootCtrl, AutoConstants.flowerAndShoot
-        )
+                        AutoConstants.redGardenPose, AutoConstants.flowerAndShootCtrl, AutoConstants.flowerAndShoot
+                )
                 .linear(AutoConstants.redGardenPose, AutoConstants.flowerAndShoot);
     }
 
     public Path leave() {
         return Paths.line(AutoConstants.flowerAndShoot, AutoConstants.redSolo2Leave).constant(AutoConstants.redSolo2Leave);
     }
+
     public Command autoRoutine(Follower follower, IntakeSS intakeSS, ShooterSS shooterSS) {
         return sequential(
                 //todo init
+                instant(() -> shooterSS.setAutoS3Up(false)),
                 parallel(
-                        instant(()-> shooterSS.updateState(ShooterSS.ShooterState.AUTO)),
-                        instant(()-> intakeSS.updateState(IntakeSS.IntakeState.ON)),
-                        instant(()-> shooterSS.updateState(ShooterSS.HoodState.AUTO)),
-                        instant(()-> shooterSS.updateState(ShooterSS.TurretState.AUTO))
+                        instant(() -> shooterSS.updatePollenState(ShooterSS.ShooterState.AUTO_S3)),
+                        instant(() -> intakeSS.updateState(IntakeSS.IntakeState.ON)),
+                        instant(() -> shooterSS.updatePollenState(ShooterSS.HoodState.AUTO_S3)),
+                        instant(() -> shooterSS.updatePollenState(ShooterSS.TurretState.AUTO_S3))
                 ),
                 waitMs(Globals.shootRevDelayMs), //todo delay for the shooter to rev up to req velocity
 
                 //todo unlock and shoot
-                instant(()-> shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED)),
+                instant(() -> shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED)),
                 waitMs(Globals.shootDelayMs),
 
                 parallel(
                         follow(follower, gardenIntake()),
-                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED))
+                        instant(() -> shooterSS.updateState(ShooterSS.LockState.LOCKED))
                         //todo shooter locks during path and stays locked
                 ),
 
                 parallel(
-                        follow(follower, flowerAndShoot())/*,*/
+                        follow(follower, flowerAndShoot()),
                         //todo shooter ss logic goes here to prepare for up side shoot
+                        instant(() -> shooterSS.setAutoS3Up(true)),
+                        instant(() -> shooterSS.updatePollenState(ShooterSS.ShooterState.AUTO_S3)),
+                        instant(() -> shooterSS.updatePollenState(ShooterSS.HoodState.AUTO_S3)),
+                        instant(() -> shooterSS.updatePollenState(ShooterSS.TurretState.AUTO_S3))
                 ),
                 parallel(
-                        instant(()-> shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED)),
-                        instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED))
-                        ),
-                ///todo flower ramp is deployed and shooter is unlocked for simultaneous shooting
+                        instant(() -> shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED)),
+                        instant(() -> intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED))
+                ),
+                //todo flower ramp is deployed and shooter is unlocked for simultaneous shooting
 
                 //todo both unlocked in case scattered nectar is somehow intaked during path
                 waitMs(Globals.flowerAndShootDelayMs), //todo special delay for flowre intake and shoot, kept high cuz we have time
 
                 parallel(
-                        instant(()-> shooterSS.updateState(ShooterSS.LockState.LOCKED)),
-                        instant(()-> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
+                        instant(() -> shooterSS.updateState(ShooterSS.LockState.LOCKED)),
+                        instant(() -> intakeSS.updateState(IntakeSS.FlowerRampState.UP)),
                         follow(follower, leave())
                 ),
                 parallel(
-                        instant(()-> intakeSS.updateState(IntakeSS.IntakeState.INIT)),
-                        instant(()-> shooterSS.updateState(ShooterSS.ShooterState.INIT))
+                        instant(() -> intakeSS.updateState(IntakeSS.IntakeState.INIT)),
+                        instant(() -> shooterSS.updatePollenState(ShooterSS.ShooterState.INIT))
                 )
                 //todo shut down and restore init after leave and park
         );

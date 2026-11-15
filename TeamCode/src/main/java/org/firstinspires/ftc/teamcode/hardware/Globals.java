@@ -51,15 +51,15 @@ public class Globals {
     public static double shootDelayMs = 500; //todo figure out actual delay
     public static double shootRevDelayMs = 250; //todo figure out
 
-//    //todo auto values pollen
-//    public static double autoShootPollen = 1000;
-//    public static double autoTurretPollen = 0.5;
-//    public static double autoHoodPollen = 0.5;
+    //todo auto values pollen
+    public static double autoShootPollen = 1000;
+    public static double autoTurretPollen = 0.5;
+    public static double autoHoodPollen = 0.5;
 
-//    //todo auto values nectar
-//    public static double autoShootNectar = 1000;
-//    public static double autoTurretNectar = 0.5;
-//    public static double autoHoodNectar = 0.5;
+    //todo auto values nectar
+    public static double autoShootNectar = 1000;
+    public static double autoTurretNectar = 0.5;
+    public static double autoHoodNectar = 0.5;
 
     //todo color sensor
     public static double colorMaxDistanceCm = 5.0;
@@ -92,4 +92,6 @@ public class Globals {
     public static double pollenHoodDown = 1000;
     //todo these are all shoot values for either up side or down side, will mostly remain similar btwn up and down side except turret
     //todo note: these values should work across blue and red alliance cuz poses are mirrored
+    public static double flowerAndShootDelayMs = 4000; //kept high cuz we have timeeee
+
 }
