@@ -27,7 +27,7 @@ public class AprilTagSS {
                 detectedClusters.add(name);
 
                 if (cluster.percentClusterFound >= 50) { //if more than 2 april tags found (for redundancy/safety)
-                    if ((name.equals("RED") && RobotHardware.getAlliance() == RobotHardware.Alliance.RED) || (name.equals("BLUE") && RobotHardware.getAlliance() == RobotHardware.Alliance.BLUE)) {
+                    if ((name.startsWith("R") && RobotHardware.getAlliance() == RobotHardware.Alliance.RED) || (name.startsWith("B") && RobotHardware.getAlliance() == RobotHardware.Alliance.BLUE)) {
                         ready = true;
                     }
                 }
