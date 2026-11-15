@@ -38,4 +38,5 @@ public class AprilTagSS {
     public boolean readyToShoot() {
         return ready;
     }
+    //todo this method returns wheher 2+ april tags visible i.e cell is up, so ready to shoot
 }
