@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.scrimmage3.auto;
+package org.firstinspires.ftc.teamcode.scrimmage3.auto.paths.red;
 
 import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.commands.Commands.waitMs;
