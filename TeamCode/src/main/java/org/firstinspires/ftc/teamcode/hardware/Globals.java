@@ -88,8 +88,8 @@ public class Globals {
     public static double pollenShootUp = 1000;
     public static double pollenTurretDown = 0.5;
     public static double pollenTurretUp = 0.5;
-    public static double pollenHoodUp = 1000;
-    public static double pollenHoodDown = 1000;
+    public static double pollenHoodUp = 0.5;
+    public static double pollenHoodDown = 0.5;
     //todo these are all shoot values for either up side or down side, will mostly remain similar btwn up and down side except turret
     //todo note: these values should work across blue and red alliance cuz poses are mirrored
     public static double flowerAndShootDelayMs = 4000; //kept high cuz we have timeeee
