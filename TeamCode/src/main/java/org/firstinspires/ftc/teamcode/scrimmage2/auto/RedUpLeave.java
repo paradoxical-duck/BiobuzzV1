@@ -29,6 +29,7 @@ public class RedUpLeave extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         follower = Constants.create(hardwareMap);
+        follower.setPose(start);
         Scheduler.reset();
         waitForStart();
 
