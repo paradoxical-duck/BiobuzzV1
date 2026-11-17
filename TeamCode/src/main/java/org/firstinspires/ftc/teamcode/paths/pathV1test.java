@@ -40,7 +40,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
         public Command autoRoutine() {
             return sequential(
                     follow(follower, shoot1()),
-//                    waitMs(1000),
+                    waitMs(1000),
                     follow(follower, shoot2()),
                     follow(follower, flower1()),
                     follow(follower, park())
