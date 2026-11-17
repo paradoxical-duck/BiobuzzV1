@@ -57,7 +57,7 @@ public class ScrimmageTele1 extends LinearOpMode {
         while (opModeIsActive()) {
             robot.clearBulkCache();
 
-            follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            follower.manual(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             follower.update();
 
             //todo intake logic

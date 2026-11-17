@@ -34,16 +34,14 @@ public class RedDownSolo3 extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(path.startPose);
 
-        while (opModeInInit()) {
-            Scheduler.reset();
-        }
+        Scheduler.reset();
         waitForStart();
 
         while (opModeIsActive()) {
             robot.clearBulkCache();
             follower.update();
             if (!scheduled) {
-                schedule(path.autoRoutine(follower, intakeSS, shooterSS));
+                schedule(path.autoRoutine(follower/*, intakeSS, shooterSS*/));
             }
             scheduled = true;
 

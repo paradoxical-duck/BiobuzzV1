@@ -11,7 +11,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 
 @TeleOp(group = "Version Testing")
-public class ShooterSSTuning extends LinearOpMode {
+public class ShooterSSTuning extends LinearOpMode
+/*todo use this to tune shooter, hood, turret values at auto shoot pose before S3*/
+{
     DcMotorEx shooter1, shooter2;
     Servo turret1, turret2, hood1, hood2;
     double[] target = new double[6];

@@ -15,7 +15,11 @@ import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
@@ -50,7 +54,9 @@ public class RobotHardware {
     //TODO =====  COLOR SENSOR  =====
     public RevColorSensorV3 colorSensor;
 
-
+    //TODO ======= ARDUCAM =========
+    public AprilTagProcessor arducam;
+    public VisionPortal visionPortal;
     //TODO =====  ALLIANCE  =====
     public enum Alliance { RED, BLUE }
     public static Alliance alliance = Alliance.RED; // static so auto's choice carries into teleop
@@ -136,6 +142,15 @@ public class RobotHardware {
         //TODO =====  COLOR SENSOR  =====
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "color sensor");
 
+        //TODO ===== ARDUCAM =====
+        arducam = AprilTagProcessor.easyCreateWithDefaults();
+
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "arducam"))
+                .addProcessor(arducam)
+                .build();
+
+        //TODO ==== VOLTAGE SENSOR ========
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
     public void clearBulkCache() {
