@@ -24,7 +24,6 @@ public class STeleOpV3 extends LinearOpMode {
     Follower follower;
     RobotHardware robot = RobotHardware.getInstance();
     public static Pose startPose = new Pose(0, 0, 0);
-
     boolean red = false;
     boolean trackingEnabled = false;
     boolean shooterEnabled = false;

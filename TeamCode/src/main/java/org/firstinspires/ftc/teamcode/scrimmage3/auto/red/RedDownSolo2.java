@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
-import org.firstinspires.ftc.teamcode.scrimmage3.auto.paths.red.RedDownSolo2Path;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 
@@ -18,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 public class RedDownSolo2 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
     Follower follower;
-    RedDownSolo2Path path;
+    AutoConstants.RedDownSolo2Path path;
     boolean scheduled = false;
     IntakeSS intakeSS;
     ShooterSS shooterSS;
@@ -30,7 +29,7 @@ public class RedDownSolo2 extends LinearOpMode {
         intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 
-        path = new RedDownSolo2Path();
+        path = new AutoConstants.RedDownSolo2Path();
         follower = Constants.create(hardwareMap);
         follower.setPose(AutoConstants.redDownStartPose);
 

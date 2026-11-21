@@ -8,7 +8,7 @@ import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.auto.paths.red.RedDownSolo3Path;
+import org.firstinspires.ftc.teamcode.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 public class RedDownSolo3 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
     Follower follower;
-    RedDownSolo3Path path;
+    AutoConstants.RedDownSolo3Path path;
     boolean scheduled = false;
     IntakeSS intakeSS;
     ShooterSS shooterSS;
@@ -30,7 +30,7 @@ public class RedDownSolo3 extends LinearOpMode {
         intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 
-        path = new RedDownSolo3Path();
+        path = new AutoConstants.RedDownSolo3Path();
         follower = Constants.create(hardwareMap);
         follower.setPose(path.startPose);
 

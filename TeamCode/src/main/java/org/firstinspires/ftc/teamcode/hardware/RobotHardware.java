@@ -55,7 +55,7 @@ public class RobotHardware {
     public RevColorSensorV3 colorSensor;
 
     //TODO ======= ARDUCAM =========
-    public AprilTagProcessor arducam;
+//    public AprilTagProcessor arducam;
     public VisionPortal visionPortal;
     //TODO =====  ALLIANCE  =====
     public enum Alliance { RED, BLUE }
@@ -143,12 +143,12 @@ public class RobotHardware {
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "color sensor");
 
         //TODO ===== ARDUCAM =====
-        arducam = AprilTagProcessor.easyCreateWithDefaults();
-
-        visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "arducam"))
-                .addProcessor(arducam)
-                .build();
+//        arducam = AprilTagProcessor.easyCreateWithDefaults();
+//
+//        visionPortal = new VisionPortal.Builder()
+//                .setCamera(hardwareMap.get(WebcamName.class, "arducam"))
+//                .addProcessor(arducam)
+//                .build();
 
         //TODO ==== VOLTAGE SENSOR ========
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
