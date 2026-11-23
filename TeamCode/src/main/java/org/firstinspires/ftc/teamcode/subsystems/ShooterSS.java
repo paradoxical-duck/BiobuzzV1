@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
@@ -17,7 +20,8 @@ public class ShooterSS {
 
     public ShooterSS(RobotHardware robot) {
         this.robot = robot;
-        robot.applyShooterPIDF();
+        robot.shooter1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.shooter2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void setAutoS3Up(boolean up) {
@@ -33,18 +37,18 @@ public class ShooterSS {
     private double nectarShooterTarget = Globals.shooterOnNectar;
 
     public void setPollenShooterTarget(double target) {
-        pollenShooterTarget = target;
+        pollenShooterTarget = Range.clip(target, 0, 1);
 
         if (pollenShooterState == ShooterState.INTERPOLATED) {
-            robot.shooter1.setVelocity(pollenShooterTarget);
+            robot.shooter1.setPower(pollenShooterTarget);
         }
     }
 
     public void setNectarShooterTarget(double target) {
-        nectarShooterTarget = target;
+        nectarShooterTarget = Range.clip(target, 0, 1);
 
         if (nectarShooterState == ShooterState.INTERPOLATED) {
-            robot.shooter2.setVelocity(nectarShooterTarget);
+            robot.shooter2.setPower(nectarShooterTarget);
         }
     }
 
@@ -53,7 +57,7 @@ public class ShooterSS {
         setNectarShooterTarget(target);
     }
 
-    private double shooterVelocity(ShooterState state, double interpolatedTarget, double disabledTarget, double autoTarget, double autoS3Target) {
+    private double shooterPower(ShooterState state, double interpolatedTarget, double disabledTarget, double autoTarget, double autoS3Target) {
         switch (state) {
             case INIT:
                 return Globals.shooterInit;
@@ -70,24 +74,24 @@ public class ShooterSS {
     }
 
     public void updatePollenState(ShooterState newState) {
-        robot.shooter1.setVelocity(shooterVelocity(
+        robot.shooter1.setPower(Range.clip(shooterPower(
                 newState,
                 pollenShooterTarget,
                 Globals.shooterOnPollen,
                 Globals.autoShootPollen,
                 autoS3Up ? Globals.pollenShootUp : Globals.pollenShootDown
-        ));
+        ), 0, 1));
         pollenShooterState = newState;
     }
 
     public void updateNectarState(ShooterState newState) {
-        robot.shooter2.setVelocity(shooterVelocity(
+        robot.shooter2.setPower(Range.clip(shooterPower(
                 newState,
                 nectarShooterTarget,
                 Globals.shooterOnNectar,
                 Globals.autoShootNectar,
                 Globals.shooterOnNectar
-        ));
+        ), 0, 1));
         nectarShooterState = newState;
     }
 

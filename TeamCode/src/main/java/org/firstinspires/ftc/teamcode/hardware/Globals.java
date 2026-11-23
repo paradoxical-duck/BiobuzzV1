@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.hardware;
+
 import com.pedropathing.math.Pose;
 
 public class Globals {
@@ -12,18 +13,18 @@ public class Globals {
     public static double shooterInit = 0;
 
     public static double turretInit = 0.5;
-    public static double hoodInit = 0.5;
+    public static double hoodInit = 0.33;
 
     //todo shooter ss pollen
-    public static double shooterOnPollen = 1000;
+    public static double shooterOnPollen = 0.5;
 
     public static double turretShootPosPollen = 0.5;
-    public static double hoodShootPosPollen = 0.5;
+    public static double hoodShootPosPollen = 0.33;
 
     //todo shooter ss nectar
-    public static double shooterOnNectar = 1000;
+    public static double shooterOnNectar = 0.5;
     public static double turretShootPosNectar = 0.5;
-    public static double hoodShootPosNectar = 0.5;
+    public static double hoodShootPosNectar = 0.33;
 
     //todo poses for odo turret tracking
     public static Pose redHiveDownSide = new Pose(57.75, 52.5292);
@@ -50,16 +51,17 @@ public class Globals {
     //todo tune
     public static double shootDelayMs = 500; //todo figure out actual delay
     public static double shootRevDelayMs = 250; //todo figure out
+    public static double flowerAndShootDelayMs = 4000;
 
     //todo auto values pollen
-    public static double autoShootPollen = 1000;
+    public static double autoShootPollen = 0.5;
     public static double autoTurretPollen = 0.5;
-    public static double autoHoodPollen = 0.5;
+    public static double autoHoodPollen = 0.33;
 
     //todo auto values nectar
-    public static double autoShootNectar = 1000;
+    public static double autoShootNectar = 0.5;
     public static double autoTurretNectar = 0.5;
-    public static double autoHoodNectar = 0.5;
+    public static double autoHoodNectar = 0.33;
 
     //todo color sensor
     public static double colorMaxDistanceCm = 5.0;
@@ -84,14 +86,12 @@ public class Globals {
     public static double kF_Nectar = 0;
 
     //TODO AUTO VALUES SCRIMMAGE 3
-    public static double pollenShootDown = 1000;
-    public static double pollenShootUp = 1000;
+    public static double pollenShootDown = 0.6;
+    public static double pollenShootUp = 0.6;
     public static double pollenTurretDown = 0.5;
     public static double pollenTurretUp = 0.5;
-    public static double pollenHoodUp = 0.5;
-    public static double pollenHoodDown = 0.5;
+    public static double pollenHoodUp = 0.33;
+    public static double pollenHoodDown = 0.33;
     //todo these are all shoot values for either up side or down side, will mostly remain similar btwn up and down side except turret
     //todo note: these values should work across blue and red alliance cuz poses are mirrored
-    public static double flowerAndShootDelayMs = 4000; //kept high cuz we have timeeee
-
 }

@@ -1,11 +1,10 @@
-package org.firstinspires.ftc.teamcode.scrimmage3.auto;
+package org.firstinspires.ftc.teamcode.scrimmage3.auto.blue;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.auto.AutoConstants;
@@ -14,12 +13,11 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 
-@Disabled
-@Autonomous(name = "Red Down Solo")
-public class RedDownSolo2 extends LinearOpMode {
+@Autonomous(name = "Blue Up Solo")
+public class BlueUpSolo2 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
     Follower follower;
-    RedDownSolo2Path path;
+    AutoConstants.BlueUpSolo2Path path;
     boolean scheduled = false;
     IntakeSS intakeSS;
     ShooterSS shooterSS;
@@ -31,9 +29,9 @@ public class RedDownSolo2 extends LinearOpMode {
         intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 
-        path = new RedDownSolo2Path();
+        path = new AutoConstants.BlueUpSolo2Path();
         follower = Constants.create(hardwareMap);
-        follower.setPose(AutoConstants.redDownStartPose);
+        follower.setPose(AutoConstants.blueDownStartPose);
 
         Scheduler.reset();
         waitForStart();

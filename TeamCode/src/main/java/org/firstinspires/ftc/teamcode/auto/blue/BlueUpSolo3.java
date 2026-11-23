@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.auto.paths.blue.BlueUpSolo3Path;
+import org.firstinspires.ftc.teamcode.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 public class BlueUpSolo3 extends LinearOpMode {
     RobotHardware robot = RobotHardware.getInstance();
     Follower follower;
-    BlueUpSolo3Path path;
+    AutoConstants.BlueUpSolo3Path path;
     boolean scheduled = false;
     IntakeSS intakeSS;
     ShooterSS shooterSS;
@@ -32,7 +32,7 @@ public class BlueUpSolo3 extends LinearOpMode {
         intakeSS = new IntakeSS(robot);
         shooterSS = new ShooterSS(robot);
 
-        path = new BlueUpSolo3Path();
+        path = new AutoConstants.BlueUpSolo3Path();
         follower = Constants.create(hardwareMap);
         follower.setPose(path.startPose);
 
