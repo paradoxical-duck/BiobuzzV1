@@ -6,6 +6,7 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.auto.paths.blue.BlueUpSolo3Path;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 
+@Disabled
 @Autonomous
 //todo before auto: GET VALUES FOR AUTO SHOOT TURRET AND HOOD
 public class BlueUpSolo3 extends LinearOpMode {

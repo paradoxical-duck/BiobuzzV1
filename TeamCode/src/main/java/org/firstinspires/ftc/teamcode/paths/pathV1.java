@@ -11,7 +11,7 @@ public class pathV1 {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(32, 9, 180);
+    public final Pose start = poseFactory.of(32, 9, 180);
     private final Pose shoot1 = poseFactory.of(13, 9, 180);
     private final Pose shoot2Start = poseFactory.of(13, 9, 180);
     private final Pose shoot2 = poseFactory.of(37.3926, 118.6015, 90);
