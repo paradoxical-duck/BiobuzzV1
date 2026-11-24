@@ -15,26 +15,46 @@ public class TrackingSS {
     public static double dx = 0;
 
     // todo turret tracking constants
-    public static double deadbandPollen = 2.0;
-    public static double deadbandNectar = 2.0;
+    public static double deadbandPollen = 0;
+    public static double deadbandNectar = 0;
 
     public static double kP_Pollen = 0.032;
     public static double kP_Nectar = 0.032;
     public static double kS_Pollen = 0.015;
     public static double kS_Nectar = 0.015;
 
-    public static double turretLeftPollen = 0.1283;
-    public static double turretRightPollen = 0.9561;
+    public static double turretLeftPollen = 0.93;
+    public static double turretRightPollen = 0.34;
     public static double turretLeftNectar = 0.1283;
     public static double turretRightNectar = 0.9561;
 
     public static double currentPollen = Globals.turretInit;
     public static double currentNectar = Globals.turretInit;
 
-    public static double turretMinAnglePollen = -42.9;
-    public static double turretMaxAnglePollen = 249.2;
+    public static double turretMinAnglePollen = -180;
+    public static double turretMaxAnglePollen = 75;
     public static double turretMinAngleNectar = -42.9;
     public static double turretMaxAngleNectar = 249.2;
+
+    public static double turretMountOffsetPollen = 0;
+    public static double turretMountOffsetNectar = 0;
+
+    public static double requestedAnglePollen = 0;
+    public static double requestedAngleNectar = 0;
+    public static double targetAnglePollen = 0;
+    public static double targetAngleNectar = 0;
+    public static double targetServoPollen = Globals.turretInit;
+    public static double targetServoNectar = Globals.turretInit;
+    public static boolean reachablePollen = false;
+    public static boolean reachableNectar = false;
+
+    public static boolean upperHive = false;
+    public static boolean overrideHive = false;
+    public static boolean overrideUpperHive = false;
+    public static double goalX = 0;
+    public static double goalY = 0;
+    public static double targetHeading = 0;
+    public static double robotHeading = 0;
 
     //todo shooter and hood interpolation constants
     public static Pose shootPose = new Pose(72, 40, 0);
@@ -56,6 +76,8 @@ public class TrackingSS {
         TrackingSS.robot = robot;
         TrackingSS.follower = follower;
         TrackingSS.alliance = alliance;
+        currentPollen = robot.turret1.getPosition();
+        currentNectar = robot.turret2.getPosition();
     }
 
     public TrackingSS(Follower follower, boolean red) {
@@ -67,57 +89,98 @@ public class TrackingSS {
         double robotX = follower.pose().x();
         double robotY = follower.pose().y();
 
+        upperHive = overrideHive ? overrideUpperHive : robotY > 70.75;
+
+        Pose goal;
+
         switch (alliance) {
             case RED:
-                if (robotY > 70.75) /*on upper half of field */ {
-                    dx = Globals.redHiveUpSide.x() - robotX;
-                    dy = Globals.redHiveUpSide.y() - robotY;
-                }
-                else {
-                    dx = Globals.redHiveDownSide.x() - robotX;
-                    dy = Globals.redHiveDownSide.y() - robotY;
-                }
+                goal = upperHive ? Globals.redHiveUpSide : Globals.redHiveDownSide;
                 break;
             case BLUE:
-                if (robotY > 70.75) /*on upper half of field */ {
-                    dx = Globals.blueHiveUpSide.x() - robotX;
-                    dy = Globals.blueHiveUpSide.y() - robotY;
-                }
-                else {
-                    dx = Globals.blueHiveDownSide.x() - robotX;
-                    dy = Globals.blueHiveDownSide.y() - robotY;
-                }
+                goal = upperHive ? Globals.blueHiveUpSide : Globals.blueHiveDownSide;
                 break;
+            default:
+                return;
         }
+
+        goalX = goal.x();
+        goalY = goal.y();
+
+        dx = goalX - robotX;
+        dy = goalY - robotY;
     }
 
-    //todo ***************** TURRET TRACKING ************************
+    public static double getReachableTurretAngle(double requested, double minAngle, double maxAngle) {
+        for (int i = -2; i <= 2; i++) {
+            double candidate = requested + 360 * i;
+
+            if (candidate >= minAngle && candidate <= maxAngle) {
+                return candidate;
+            }
+        }
+
+        double minError = Math.abs(Math.toDegrees(angleWrap(Math.toRadians(requested - minAngle))));
+        double maxError = Math.abs(Math.toDegrees(angleWrap(Math.toRadians(requested - maxAngle))));
+
+        return minError <= maxError ? minAngle : maxAngle;
+    }
+
+    public static boolean isTurretAngleReachable(double requested, double minAngle, double maxAngle) {
+        for (int i = -2; i <= 2; i++) {
+            double candidate = requested + 360 * i;
+
+            if (candidate >= minAngle && candidate <= maxAngle) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //todo ****************** TURRET TRACKING *******************
     public static double getPollenTurretPos() {
         setDxAndDy();
 
-        double targetHeading = Math.atan2(dy, dx);
-        double robotHeading = follower.pose().heading();
+        targetHeading = Math.toDegrees(Math.atan2(dy, dx));
+        robotHeading = Math.toDegrees(follower.pose().heading());
 
-        double turretTarget = angleWrap(
-                targetHeading - robotHeading + Math.toRadians(Globals.turretOffsetPollen)
+        requestedAnglePollen = Math.toDegrees(angleWrap(
+                Math.toRadians(
+                        targetHeading
+                                - robotHeading
+                                + turretMountOffsetPollen
+                                + Globals.turretOffsetPollen
+                )
+        ));
+
+        reachablePollen = isTurretAngleReachable(
+                requestedAnglePollen,
+                turretMinAnglePollen,
+                turretMaxAnglePollen
         );
 
-        double turretCurrent = Math.toRadians(getPollenTurret());
-        double error = angleWrap(turretTarget - turretCurrent);
+        targetAnglePollen = getReachableTurretAngle(
+                requestedAnglePollen,
+                turretMinAnglePollen,
+                turretMaxAnglePollen
+        );
 
-        if (Math.abs(Math.toDegrees(error)) > deadbandPollen) {
-            double adjustment = error * kP_Pollen;
+        double originalServoTarget = Range.clip(
+                map(
+                        targetAnglePollen,
+                        turretMinAnglePollen,
+                        turretMaxAnglePollen,
+                        turretLeftPollen,
+                        turretRightPollen
+                ),
+                Math.min(turretLeftPollen, turretRightPollen),
+                Math.max(turretLeftPollen, turretRightPollen)
+        );
 
-            if (Math.abs(Math.toDegrees(error)) > deadbandPollen + 1.5) {
-                adjustment += Math.signum(error) * kS_Pollen;
-            }
+        targetServoPollen = turretLeftPollen + turretRightPollen - originalServoTarget;
 
-            currentPollen = Range.clip(
-                    currentPollen + adjustment,
-                    turretLeftPollen,
-                    turretRightPollen
-            );
-        }
+        currentPollen = targetServoPollen;
 
         return currentPollen;
     }
@@ -125,29 +188,43 @@ public class TrackingSS {
     public static double getNectarTurretPos() {
         setDxAndDy();
 
-        double targetHeading = Math.atan2(dy, dx);
-        double robotHeading = follower.pose().heading();
+        double heading = Math.toDegrees(Math.atan2(dy, dx));
+        double robotAngle = Math.toDegrees(follower.pose().heading());
 
-        double turretTarget = angleWrap(
-                targetHeading - robotHeading + Math.toRadians(Globals.turretOffsetNectar)
+        requestedAngleNectar = Math.toDegrees(angleWrap(
+                Math.toRadians(
+                        heading
+                                - robotAngle
+                                + turretMountOffsetNectar
+                                + Globals.turretOffsetNectar
+                )
+        ));
+
+        reachableNectar = isTurretAngleReachable(
+                requestedAngleNectar,
+                turretMinAngleNectar,
+                turretMaxAngleNectar
         );
 
-        double turretCurrent = Math.toRadians(getNectarTurret());
-        double error = angleWrap(turretTarget - turretCurrent);
+        targetAngleNectar = getReachableTurretAngle(
+                requestedAngleNectar,
+                turretMinAngleNectar,
+                turretMaxAngleNectar
+        );
 
-        if (Math.abs(Math.toDegrees(error)) > deadbandNectar) {
-            double adjustment = error * kP_Nectar;
+        targetServoNectar = Range.clip(
+                map(
+                        targetAngleNectar,
+                        turretMinAngleNectar,
+                        turretMaxAngleNectar,
+                        turretLeftNectar,
+                        turretRightNectar
+                ),
+                Math.min(turretLeftNectar, turretRightNectar),
+                Math.max(turretLeftNectar, turretRightNectar)
+        );
 
-            if (Math.abs(Math.toDegrees(error)) > deadbandNectar + 1.5) {
-                adjustment += Math.signum(error) * kS_Nectar;
-            }
-
-            currentNectar = Range.clip(
-                    currentNectar + adjustment,
-                    turretLeftNectar,
-                    turretRightNectar
-            );
-        }
+        currentNectar = targetServoNectar;
 
         return currentNectar;
     }
@@ -194,32 +271,37 @@ public class TrackingSS {
         return error;
     }
 
-    //todo ***************** SHOOTER INTERPOLATION ************************
+    //todo ****************** SHOOTER INTERPOLATION *******************
     public static void interpolate() {
         setDxAndDy();
 
-        double robotX = follower.pose().x();
-        double robotY = follower.pose().y();
-
-        double goalX = robotX + dx;
-        double goalY = robotY + dy;
-
         rangeVal = Math.hypot(dx, dy);
+
+        Pose referenceHive = alliance == RobotHardware.Alliance.RED
+                ? Globals.redHiveDownSide
+                : Globals.blueHiveDownSide;
+
+        double referenceX = alliance == RobotHardware.Alliance.RED
+                ? shootPose.x()
+                : 141.5 - shootPose.x();
+
         referenceDist = Math.hypot(
-                goalX - shootPose.x(),
-                goalY - shootPose.y()
+                referenceHive.x() - referenceX,
+                referenceHive.y() - shootPose.y()
         );
 
         double distanceError = rangeVal - referenceDist;
 
-        targetRpmPollen = Math.max(
-                0,
-                Globals.shooterOnPollen + distanceError * rpmPerInchPollen
+        targetRpmPollen = Range.clip(
+                Globals.shooterOnPollen + distanceError * rpmPerInchPollen,
+                0.0,
+                1.0
         );
 
-        targetRpmNectar = Math.max(
-                0,
-                Globals.shooterOnNectar + distanceError * rpmPerInchNectar
+        targetRpmNectar = Range.clip(
+                Globals.shooterOnNectar + distanceError * rpmPerInchNectar,
+                0.0,
+                1.0
         );
 
         targetHoodPollen = Range.clip(
@@ -262,6 +344,7 @@ public class TrackingSS {
     public static void updateTracking(ShooterSS shooterSS) {
         currentPollen = robot.turret1.getPosition();
         currentNectar = robot.turret2.getPosition();
+
         shooterSS.setPollenTurretTarget(getPollenTurretPos());
         shooterSS.setNectarTurretTarget(getNectarTurretPos());
 
