@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.math.Pose;
 
+@Config       // live-editable in FTC Dashboard -> Config -> Globals (click SAVE)
+@Configurable // also live-editable in Panels -> Configurables
 public class Globals {
 
     //todo intake
@@ -12,17 +16,26 @@ public class Globals {
     //todo shooter ss
     public static double shooterInit = 0;
 
-    public static double turretInit = 0.5;
+    public static double turretInit = 0.5; //todo Nectar (turret2) init, Pollen uses turret1Init
     public static double hoodInit = 0.33;
 
+    //todo turret1 (Pollen) - tuned with ShooterPollenTuner
+    public static double turret1Init = 0.62;       // faces straight front
+    public static double turret1RightLimit = 0.48; // lower value = turns right (seen from back), mech limit
+    public static double turret1LeftLimit = 0.83;  // higher value = turns left, limit for now
+
+    //todo hood1 (Pollen) - tuned with ShooterPollenTuner
+    public static double hood1Up = 0.33;   // max up
+    public static double hood1Down = 0.51; // max down
+
     //todo shooter ss pollen
-    public static double shooterOnPollen = 0.5;
+    public static double shooterOnPollen = 1650; // ticks/s, tuned
 
     public static double turretShootPosPollen = 0.5;
-    public static double hoodShootPosPollen = 0.33;
+    public static double hoodShootPosPollen = 0.4; // tuned
 
     //todo shooter ss nectar
-    public static double shooterOnNectar = 0.5;
+    public static double shooterOnNectar = 1000; //todo velocity in ticks/s
     public static double turretShootPosNectar = 0.5;
     public static double hoodShootPosNectar = 0.33;
 
@@ -43,8 +56,8 @@ public class Globals {
     //todo TUNE^^^^^^^^^^
 
     //todo shooter lock poses POLLEN
-    public static double feedLock1Open = 0.5;
-    public static double feedLock1Close = 0.5;
+    public static double feedLock1Open = 0.75;  // pass
+    public static double feedLock1Close = 0.54; // block, also init
     //todo shooter lock poses NECTAR
     public static double feedLock2Open = 0.5;
     public static double feedLock2Close = 0.5;
@@ -54,12 +67,12 @@ public class Globals {
     public static double flowerAndShootDelayMs = 4000;
 
     //todo auto values pollen
-    public static double autoShootPollen = 0.5;
+    public static double autoShootPollen = 1000; //todo ticks/s
     public static double autoTurretPollen = 0.5;
     public static double autoHoodPollen = 0.33;
 
     //todo auto values nectar
-    public static double autoShootNectar = 0.5;
+    public static double autoShootNectar = 1000; //todo ticks/s
     public static double autoTurretNectar = 0.5;
     public static double autoHoodNectar = 0.33;
 
@@ -74,10 +87,10 @@ public class Globals {
     public static double blueNectarHueTolerance = 20;
 
     //todo shooter pidf values pollen
-    public static double kP_Pollen = 0;
+    public static double kP_Pollen = 30; // tuned
     public static double kI_Pollen = 0;
     public static double kD_Pollen = 0;
-    public static double kF_Pollen = 0;
+    public static double kF_Pollen = 12.5; // tuned
 
     //todo shooter pidf values nectar
     public static double kP_Nectar = 0;
@@ -86,8 +99,8 @@ public class Globals {
     public static double kF_Nectar = 0;
 
     //TODO AUTO VALUES SCRIMMAGE 3
-    public static double pollenShootDown = 0.6;
-    public static double pollenShootUp = 0.6;
+    public static double pollenShootDown = 1000; //todo ticks/s
+    public static double pollenShootUp = 1000; //todo ticks/s
     public static double pollenTurretDown = 0.5;
     public static double pollenTurretUp = 0.5;
     public static double pollenHoodUp = 0.33;

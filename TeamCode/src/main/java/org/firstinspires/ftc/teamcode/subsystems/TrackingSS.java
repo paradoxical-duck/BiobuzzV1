@@ -28,7 +28,7 @@ public class TrackingSS {
     public static double turretLeftNectar = 0.1283;
     public static double turretRightNectar = 0.9561;
 
-    public static double currentPollen = Globals.turretInit;
+    public static double currentPollen = Globals.turret1Init;
     public static double currentNectar = Globals.turretInit;
 
     public static double turretMinAnglePollen = -42.9;

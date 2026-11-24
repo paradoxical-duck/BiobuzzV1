@@ -20,13 +20,13 @@ public class ShooterSSTuning extends LinearOpMode
     DcMotorEx shooter;
     Servo turret, hood;
 
-    double power = 0;
+    double velocity = 0; // ticks/s
     double turretPos, hoodPos;
     int selected = 0;
     boolean intakeEnabled = false;
     boolean lastLB, lastRB, lastUp, lastDown, lastX;
 
-    String[] names = {"Pollen Power", "Pollen Turret", "Pollen Hood"};
+    String[] names = {"Pollen Velocity", "Pollen Turret", "Pollen Hood"};
 
     @Override
     public void runOpMode() {
@@ -37,7 +37,7 @@ public class ShooterSSTuning extends LinearOpMode
         turret = robot.turret1;
         hood = robot.hood1;
 
-        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         turretPos = turret.getPosition();
         hoodPos = hood.getPosition();
@@ -57,20 +57,20 @@ public class ShooterSSTuning extends LinearOpMode
             }
 
             if (gamepad1.dpad_up && !lastUp) {
-                if (selected == 0) power = Range.clip(power + 0.1, 0, 1);
+                if (selected == 0) velocity += 50;
                 if (selected == 1) turretPos = Range.clip(turretPos + 0.01, 0, 1);
                 if (selected == 2) hoodPos = Range.clip(hoodPos + 0.01, 0, 1);
             }
 
             if (gamepad1.dpad_down && !lastDown) {
-                if (selected == 0) power = Range.clip(power - 0.1, 0, 1);
+                if (selected == 0) velocity = Math.max(0, velocity - 50);
                 if (selected == 1) turretPos = Range.clip(turretPos - 0.01, 0, 1);
                 if (selected == 2) hoodPos = Range.clip(hoodPos - 0.01, 0, 1);
             }
 
-            if (gamepad1.x && !lastX) power = 0;
+            if (gamepad1.x && !lastX) velocity = 0;
 
-            shooter.setPower(power);
+            shooter.setVelocity(velocity);
             turret.setPosition(turretPos);
             hood.setPosition(hoodPos);
 
@@ -86,12 +86,12 @@ public class ShooterSSTuning extends LinearOpMode
             telemetry.addLine("X: Stop shooter");
 
             telemetry.addData("Selected", names[selected]);
-            telemetry.addData("Power step", 0.1);
+            telemetry.addData("Velocity step (ticks/s)", 50);
             telemetry.addData("Servo step", 0.01);
             telemetry.addData("Intake", intakeSS.getIntakeState());
 
             telemetry.addLine("******** POLLEN ********");
-            telemetry.addData("Shooter power", shooter.getPower());
+            telemetry.addData("Target velocity (ticks/s)", velocity);
             telemetry.addData("Shooter velocity (ticks/s)", shooter.getVelocity());
             telemetry.addData("Shooter current (A)", shooter.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("Turret getPosition()", turret.getPosition());
@@ -101,7 +101,7 @@ public class ShooterSSTuning extends LinearOpMode
             idle();
         }
 
-        shooter.setPower(0);
+        shooter.setVelocity(0);
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
     }
 }
