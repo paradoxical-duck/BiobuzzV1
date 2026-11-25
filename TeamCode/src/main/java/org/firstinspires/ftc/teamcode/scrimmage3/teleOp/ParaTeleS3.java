@@ -236,7 +236,7 @@ public class ParaTeleS3 extends LinearOpMode {
                 IntakeSS.IntakeState targetState;
 
                 if (ballCount == 4) {
-                    targetState = !pollenBeam ? IntakeSS.IntakeState.INIT : IntakeSS.IntakeState.FEED;
+                    targetState = IntakeSS.IntakeState.INIT;
                 }
                 else if (ballCount >= 2) {
                     targetState = IntakeSS.IntakeState.POINT_FIVE;

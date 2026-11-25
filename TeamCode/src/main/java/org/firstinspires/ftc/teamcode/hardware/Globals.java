@@ -43,8 +43,8 @@ public class Globals {
     //todo TUNE^^^^^^^^^^
 
     //todo shooter lock poses POLLEN
-    public static double feedLock1Open = 0.75;
-    public static double feedLock1Close = 0.54;
+    public static double feedLock1Open = 0.7;
+    public static double feedLock1Close = 0.61;
     //todo shooter lock poses NECTAR
     public static double feedLock2Open = 0.5;
     public static double feedLock2Close = 0.5;
