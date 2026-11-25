@@ -8,7 +8,7 @@ public class IntakeSS {
     public IntakeSS (RobotHardware robot) {
         this.robot = robot;
     }
-    public enum IntakeState {ON, INIT, REVERSE, FEED}
+    public enum IntakeState {ON, INIT, REVERSE, FEED, POINT_FIVE}
     public IntakeState intakeState = IntakeState.INIT;
     public void updateState(IntakeState newState) {
         double target1 = 0;
@@ -29,6 +29,10 @@ public class IntakeSS {
             case FEED:
                 target1 = Globals.intakeOff;
                 target2 = Globals.intakeOn;
+                break;
+            case POINT_FIVE:
+                target1 = 0.5;
+                target2 = 0.5;
                 break;
         }
         robot.intake1.setPower(target1);

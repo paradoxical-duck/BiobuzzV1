@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
 @TeleOp(name = "ducky")
-public class Scrimmage3Tele extends LinearOpMode {
+public class ParaTeleS3 extends LinearOpMode {
     IntakeSS intakeSS;
     ShooterSS shooterSS;
     Follower follower;
@@ -36,6 +36,7 @@ public class Scrimmage3Tele extends LinearOpMode {
 
     //TODO COUNT VARIABLE
     public static int ballCount;
+    int lastBallCount = 0;
 
     //TODO BALL COLORS
     boolean isShooting = false;
@@ -87,6 +88,7 @@ public class Scrimmage3Tele extends LinearOpMode {
         robot.turret2.setPosition(0.5);
 
         ballCount = 0;
+        lastBallCount = 0;
 
         while (opModeInInit()) {
             robot.readGamepads(gamepad1, gamepad2);
@@ -107,6 +109,9 @@ public class Scrimmage3Tele extends LinearOpMode {
 
             telemetry.addLine("Initialized");
             telemetry.addLine(RobotHardware.getAlliance() + " alliance active");
+
+            PrintData.menu(robot.currentGamepad1, robot.previousGamepad1, telemetry);
+
             telemetry.update();
         }
 
@@ -123,41 +128,43 @@ public class Scrimmage3Tele extends LinearOpMode {
             ballCount = 1;
         }
 
+        lastBallCount = ballCount;
+
         while (opModeIsActive()) {
             robot.clearBulkCache();
             robot.update();
             robot.readGamepads(gamepad1, gamepad2);
 
-            Gamepad g1 = robot.currentGamepad1;
-            Gamepad g2 = robot.currentGamepad2;
-            Gamepad p1 = robot.previousGamepad1;
-            Gamepad p2 = robot.previousGamepad2;
+            Gamepad gamepad1 = robot.currentGamepad1;
+            Gamepad gamepad2 = robot.currentGamepad2;
+            Gamepad previousGamepad1 = robot.previousGamepad1;
+            Gamepad previousGamepad2 = robot.previousGamepad2;
 
             follower.manual(ManualDrive.fieldCentric(
-                    -g1.left_stick_y,
-                    -g1.left_stick_x,
-                    -g1.right_stick_x,
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
                     follower.pose().heading()
             ));
             follower.update();
 
-            if (g2.a && !p2.a) {
+            if (gamepad2.a && !previousGamepad2.a) {
                 follower.setPose(new Pose(red ? 0 : 141.5, 0, follower.pose().heading()));
                 TrackingSS.resetHiveSelection();
             }
 
-            if (g2.b && !p2.b) {
+            if (gamepad2.b && !previousGamepad2.b) {
                 follower.setPose(new Pose(red ? 0 : 141.5, 141.5, follower.pose().heading()));
                 TrackingSS.resetHiveSelection();
             }
 
             TrackingSS.setDxAndDy();
 
-            if (g2.back && !p2.back) {
+            if (gamepad2.back && !previousGamepad2.back) {
                 TrackingSS.toggleHive();
             }
 
-            if (g2.start && !p2.start) {
+            if (gamepad2.start && !previousGamepad2.start) {
                 trackingEnabled = !trackingEnabled;
 
                 if (trackingEnabled) {
@@ -174,7 +181,7 @@ public class Scrimmage3Tele extends LinearOpMode {
             }
 
             //todo intake logic
-            if (!isShooting && g1.right_bumper && !p1.right_bumper) {
+            if (!isShooting && gamepad1.right_bumper && !previousGamepad1.right_bumper) {
                 intakeEnabled = !intakeEnabled || intakeReversed;
                 intakeReversed = false;
 
@@ -187,7 +194,7 @@ public class Scrimmage3Tele extends LinearOpMode {
                 }
             }
 
-            if (!isShooting && g1.x && !p1.x) {
+            if (!isShooting && gamepad1.x && !previousGamepad1.x) {
                 intakeReversed = !intakeReversed;
                 intakeEnabled = intakeReversed;
 
@@ -219,16 +226,27 @@ public class Scrimmage3Tele extends LinearOpMode {
             lastFrontBeam = frontBeam;
             lastPollenBeam = pollenBeam;
 
-            if (ballCount == 4 && intakeEnabled && !intakeReversed && !isShooting) {
-                if (!pollenBeam) {
-                    if (intakeSS.getIntakeState() != IntakeSS.IntakeState.INIT) {
-                        intakeSS.updateState(IntakeSS.IntakeState.INIT);
-                    }
+            if (ballCount == 4 && lastBallCount < 4) {
+                this.gamepad1.rumble(250);
+            }
+
+            lastBallCount = ballCount;
+
+            if (intakeEnabled && !intakeReversed && !isShooting) {
+                IntakeSS.IntakeState targetState;
+
+                if (ballCount == 4) {
+                    targetState = !pollenBeam ? IntakeSS.IntakeState.INIT : IntakeSS.IntakeState.FEED;
+                }
+                else if (ballCount >= 2) {
+                    targetState = IntakeSS.IntakeState.POINT_FIVE;
                 }
                 else {
-                    if (intakeSS.getIntakeState() != IntakeSS.IntakeState.FEED) {
-                        intakeSS.updateState(IntakeSS.IntakeState.FEED);
-                    }
+                    targetState = IntakeSS.IntakeState.ON;
+                }
+
+                if (intakeSS.getIntakeState() != targetState) {
+                    intakeSS.updateState(targetState);
                 }
             }
 
@@ -241,7 +259,7 @@ public class Scrimmage3Tele extends LinearOpMode {
                 shooterSS.updatePollenState(ShooterSS.ShooterState.INIT);
             }
 
-            if (g1.left_bumper && !p1.left_bumper && ballCount > 0 && !isShooting) {
+            if (gamepad1.left_bumper && !previousGamepad1.left_bumper && ballCount > 0 && !isShooting) {
                 shooterPaused = false;
 
                 if (!shooterEnabled) {
@@ -281,7 +299,7 @@ public class Scrimmage3Tele extends LinearOpMode {
                 }
             }
 
-            if (g1.back && !p1.back) {
+            if (gamepad1.back && !previousGamepad1.back) {
                 intakeEnabled = false;
                 intakeReversed = false;
                 shooterEnabled = false;
@@ -296,7 +314,6 @@ public class Scrimmage3Tele extends LinearOpMode {
                 shooterSS.updateState(ShooterSS.LockState.LOCKED);
             }
 
-            PrintData.menu(g2, p2, telemetry);
             PrintData.print(robot, follower, intakeSS, shooterSS, null, trackingEnabled, shooterEnabled, ballCount, telemetry);
 
             telemetry.update();
