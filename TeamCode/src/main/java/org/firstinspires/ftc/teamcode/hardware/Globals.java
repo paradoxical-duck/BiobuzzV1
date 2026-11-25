@@ -50,9 +50,9 @@ public class Globals {
     public static double turretOffsetNectar = 0.0;
 
     //todo flower deploy poses
-    public static double intakeDeployUp = 0.5;
-    public static double intakeDeployDown = 0.5;
-    public static double intakeDeployInit = 0.5;
+    public static double intakeDeployUp = 0.78;
+    public static double intakeDeployDown = 0.38;
+    public static double intakeDeployInit = 0.8;
     //todo TUNE^^^^^^^^^^
 
     //todo shooter lock poses POLLEN

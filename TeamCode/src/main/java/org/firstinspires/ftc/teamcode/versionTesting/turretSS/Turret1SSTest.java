@@ -37,6 +37,15 @@ import org.firstinspires.ftc.teamcode.subsystems.turret1_ss;
  *   DPAD RIGHT     goal mode AUTO -> FORCE_UP -> FORCE_DOWN
  *   DPAD DOWN      stop tracking, turret to centre
  *   B              reset pose to START pose (robot back on start spot)
+ *   RIGHT STICK BTN  reset pose to corner (by alliance, drive-team side):
+ *                      RED  -> (9, 9, 0)         BLUE -> (132.5, 132.5, 180)
+ *   LEFT STICK BTN   reset pose to corner:
+ *                      RED  -> (9, 132.5, 0)     BLUE -> (132.5, 9, 180)
+ *   Push the robot into that corner first, facing the given heading.
+ *
+ * FIELD CENTRIC is from the DRIVER's view: stick forward = away from your
+ * drive-team wall. RED drivers stand at x = 0 (forward = +x),
+ * BLUE drivers at x = 141.5 (forward = -x) -> RED_DRIVER_DEG / BLUE_DRIVER_DEG.
  *
  * Live values: Dashboard Config -> turret1_ss / Turret1SSTest (click SAVE),
  *              or Panels Configurables.
@@ -50,6 +59,18 @@ public class Turret1SSTest extends CommandOpMode {
     public static double START_Y = 9;
     public static double START_HEADING_DEG = 0;
     public static boolean FIELD_CENTRIC = true;
+
+    // Corner reset poses (x, y in inches, heading in degrees). Tune live.
+    public static double RED_RS_X = 9,      RED_RS_Y = 9,      RED_RS_H = 0;    // RED  right stick btn
+    public static double RED_LS_X = 9,      RED_LS_Y = 132.5,  RED_LS_H = 0;    // RED  left stick btn
+    public static double BLUE_RS_X = 132.5, BLUE_RS_Y = 132.5, BLUE_RS_H = 180; // BLUE right stick btn
+    public static double BLUE_LS_X = 132.5, BLUE_LS_Y = 9,     BLUE_LS_H = 180; // BLUE left stick btn
+
+    // Field-centric "forward" direction for each drive team (field degrees).
+    public static double RED_DRIVER_DEG = 0;    // red drivers look towards +x
+    public static double BLUE_DRIVER_DEG = 180; // blue drivers look towards -x
+
+    private String lastReset = "start pose";
 
     private final RobotHardware robot = RobotHardware.getInstance();
     private Follower follower;
@@ -78,7 +99,14 @@ public class Turret1SSTest extends CommandOpMode {
         gp.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(turret.centerCommand());
         gp.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new InstantCommand(() -> follower.setPose(startPose())));
+                .whenPressed(new InstantCommand(() -> {
+                    follower.setPose(startPose());
+                    lastReset = "start pose";
+                }));
+        gp.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+                .whenPressed(new InstantCommand(() -> cornerReset(true)));
+        gp.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON)
+                .whenPressed(new InstantCommand(() -> cornerReset(false)));
 
         boolean lastA = false;
         while (opModeInInit()) {
@@ -106,7 +134,10 @@ public class Turret1SSTest extends CommandOpMode {
         double strafe = -gamepad1.left_stick_x;
         double turn = -gamepad1.right_stick_x * 0.7;
         if (FIELD_CENTRIC) {
-            DrivePowers powers = ManualDrive.fieldCentric(forward, strafe, turn, follower.pose().heading());
+            // Subtract the driver's view direction so stick forward = away from the driver.
+            double driverDeg = RobotHardware.isRed() ? RED_DRIVER_DEG : BLUE_DRIVER_DEG;
+            DrivePowers powers = ManualDrive.fieldCentric(forward, strafe, turn,
+                    follower.pose().heading() - Math.toRadians(driverDeg));
             follower.manual(powers);
         } else {
             follower.manual(forward, strafe, turn);
@@ -121,6 +152,8 @@ public class Turret1SSTest extends CommandOpMode {
         tele.addData("Loop ms", "%.1f", loopTimer.milliseconds());
         loopTimer.reset();
         tele.addLine("DPAD UP track | DPAD RIGHT goal mode | DPAD DOWN centre | B reset pose");
+        tele.addLine("RS btn / LS btn: corner pose reset (by alliance)");
+        tele.addData("Last pose reset", lastReset);
         tele.addData("Alliance", RobotHardware.getAlliance());
         tele.addData("Tracking", turret.tracking);
         tele.addData("Goal mode", turret.goalMode);
@@ -137,6 +170,24 @@ public class Turret1SSTest extends CommandOpMode {
         tele.addData("y", "%.1f", p.y());
         tele.addData("heading deg", "%.1f", Math.toDegrees(p.heading()));
         tele.update();
+    }
+
+    /** Sets the pose to one of the two corners of the current alliance. */
+    private void cornerReset(boolean rightStick) {
+        boolean red = RobotHardware.isRed();
+        double x, y, h;
+        if (red) {
+            x = rightStick ? RED_RS_X : RED_LS_X;
+            y = rightStick ? RED_RS_Y : RED_LS_Y;
+            h = rightStick ? RED_RS_H : RED_LS_H;
+        } else {
+            x = rightStick ? BLUE_RS_X : BLUE_LS_X;
+            y = rightStick ? BLUE_RS_Y : BLUE_LS_Y;
+            h = rightStick ? BLUE_RS_H : BLUE_LS_H;
+        }
+        follower.setPose(new Pose(x, y, Math.toRadians(h)));
+        lastReset = String.format("%s %s (%.1f, %.1f, %.0f)",
+                red ? "RED" : "BLUE", rightStick ? "RS" : "LS", x, y, h);
     }
 
     private static Pose startPose() {

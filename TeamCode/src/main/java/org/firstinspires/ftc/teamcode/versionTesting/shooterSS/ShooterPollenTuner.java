@@ -57,31 +57,7 @@ import java.util.List;
 @Config
 @Configurable
 @TeleOp(name = "Shooter Pollen Tuner", group = "Version Testing")
-public class
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ShooterPollenTuner extends CommandOpMode {
+public class ShooterPollenTuner extends CommandOpMode {
 
     // ===== Live-tunable values (FTC Dashboard Config tab) =====
     public static double TURRET1 = Globals.turret1Init;

@@ -41,7 +41,7 @@ public class turret2_ss extends SubsystemBase {
     // ===== Turret2 (Nectar) calibration: two-point, piecewise linear =====
     public static double TURRET2_CENTER = 0.50;    // 0 deg  TODO calibrate turret2
     public static double TURRET2_LEFT_90 = 0.72;   // -90 deg (robot left)  TODO calibrate
-    public static double TURRET2_RIGHT_90 = 0.28;  // +90 deg (robot right) TODO calibrate
+    public static double TURRET2_RIGHT_90  = 0.28;  // +90 deg (robot right) TODO calibrate
     public static double TURRET2_MIN_DEG = -90;    // functional range
     public static double TURRET2_MAX_DEG = 90;
     public static double TURRET2_TRIM_DEG = 0;     // small aim correction, + = more right
