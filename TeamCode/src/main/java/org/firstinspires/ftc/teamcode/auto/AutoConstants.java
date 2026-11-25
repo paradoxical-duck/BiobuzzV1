@@ -36,7 +36,7 @@ public class AutoConstants {
     public static final Pose redDownLeaveCtrl = poseFactory.of(18.7138, 51.4447, 0);
 
     // Red solo 2
-    public static final Pose redFlowerAndShoot = poseFactory.of(53.85, 128.0821, 90);
+    public static final Pose redFlowerAndShoot = poseFactory.of(53.85, 128.0821, 90); //todo TUNEEEEEEEE!!!!
     public static final Pose redFlowerAndShootCtrl = poseFactory.of(45.0655, 61.4432, 0);
     public static final Pose redFlowerAndShootCtrl2 = poseFactory.of(0, 94.659, 0);
     public static final Pose redSolo2Leave = poseFactory.of(13.2197, 116.5202, 90);
