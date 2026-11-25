@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
+import java.util.Arrays;
+
 public class PrintData {
     private static final String[] sections = {
             "Critical Info",
@@ -23,6 +25,12 @@ public class PrintData {
 
     private static final boolean[] enabled = new boolean[sections.length];
     private static int cursor = 0;
+
+    public static void reset() {
+        Arrays.fill(enabled, false);
+        enabled[0] = true;
+        cursor = 0;
+    }
 
     public static void menu(Gamepad gamepad, Gamepad previousGamepad, Telemetry telemetry) {
         if (gamepad.dpad_down && !previousGamepad.dpad_down) {
@@ -77,12 +85,15 @@ public class PrintData {
             telemetry.addLine("");
             telemetry.addLine("***Shooter***");
             telemetry.addData("Shooter state (P/N)", shooterSS.getPollenShooterState() + " / " + shooterSS.getNectarShooterState());
-            telemetry.addData("Target velocity pollen", TrackingSS.getTargetRpmPollen());
-            telemetry.addData("Target velocity nectar", TrackingSS.getTargetRpmNectar());
+            telemetry.addData("Target velocity pollen", shooterSS.getPollenShooterState() == ShooterSS.ShooterState.INIT ? Globals.shooterInit :
+                    shooterSS.getPollenShooterState() == ShooterSS.ShooterState.ON || shooterSS.getPollenShooterState() == ShooterSS.ShooterState.INTERPOL_DISABLED ? Globals.shooterOnPollen : TrackingSS.getTargetRpmPollen());
+            telemetry.addData("Target velocity nectar", shooterSS.getNectarShooterState() == ShooterSS.ShooterState.INIT ? Globals.shooterInit :
+                    shooterSS.getNectarShooterState() == ShooterSS.ShooterState.ON || shooterSS.getNectarShooterState() == ShooterSS.ShooterState.INTERPOL_DISABLED ? Globals.shooterOnNectar : TrackingSS.getTargetRpmNectar());
             telemetry.addData("Shooter1 velocity", robot.shooter1.getVelocity());
             telemetry.addData("Shooter1 current", robot.amps(robot.shooter1));
             telemetry.addData("Shooter2 velocity", robot.shooter2.getVelocity());
             telemetry.addData("Shooter2 current", robot.amps(robot.shooter2));
+            telemetry.addData("Lock state", shooterSS.getLockState());
         }
 
         if (enabled[4]) {
@@ -92,28 +103,44 @@ public class PrintData {
             telemetry.addData("Turret position (P/N)", robot.turret1.getPosition() + " / " + robot.turret2.getPosition());
             telemetry.addData("Turret angle pollen", TrackingSS.getPollenTurret());
             telemetry.addData("Turret angle nectar", TrackingSS.getNectarTurret());
+
+            if (trackingEnabled) {
+                telemetry.addData("Selected hive", TrackingSS.upperHive ? "UP" : "DOWN");
+                telemetry.addData("Hive selection", TrackingSS.overrideHive ? "MANUAL" : "AUTO");
+                telemetry.addData("Hive X", TrackingSS.goalX);
+                telemetry.addData("Hive Y", TrackingSS.goalY);
+                telemetry.addData("Requested pollen angle", TrackingSS.requestedAnglePollen);
+                telemetry.addData("Target pollen angle", TrackingSS.targetAnglePollen);
+                telemetry.addData("Pollen target reachable", TrackingSS.reachablePollen);
+            }
         }
 
         if (enabled[5]) {
             telemetry.addLine("");
             telemetry.addLine("***Hood***");
             telemetry.addData("Hood state (P/N)", shooterSS.getPollenHoodState() + " / " + shooterSS.getNectarHoodState());
-            telemetry.addData("Target hood pollen", TrackingSS.getTargetHoodPollen());
-            telemetry.addData("Target hood nectar", TrackingSS.getTargetHoodNectar());
+            telemetry.addData("Target hood pollen", shooterSS.getPollenHoodState() == ShooterSS.HoodState.SHOOT ? Globals.hoodShootPosPollen : TrackingSS.getTargetHoodPollen());
+            telemetry.addData("Target hood nectar", shooterSS.getNectarHoodState() == ShooterSS.HoodState.SHOOT ? Globals.hoodShootPosNectar : TrackingSS.getTargetHoodNectar());
             telemetry.addData("Hood position (P/N)", robot.hood1.getPosition() + " / " + robot.hood2.getPosition());
         }
 
         if (enabled[6]) {
             telemetry.addLine("");
             telemetry.addLine("***Color SS***");
-            telemetry.addData("Ball 1", colorSS.ball1);
-            telemetry.addData("Ball 2", colorSS.ball2);
-            telemetry.addData("Ball 3", colorSS.ball3);
-            telemetry.addData("Ball 4", colorSS.ball4);
-            telemetry.addData("Hue", colorSS.getHue());
-            telemetry.addData("Saturation", colorSS.getSaturation());
-            telemetry.addData("Value", colorSS.getValue());
-            telemetry.addData("Distance (cm)", colorSS.getDistance());
+
+            if (colorSS != null) {
+                telemetry.addData("Ball 1", colorSS.ball1);
+                telemetry.addData("Ball 2", colorSS.ball2);
+                telemetry.addData("Ball 3", colorSS.ball3);
+                telemetry.addData("Ball 4", colorSS.ball4);
+                telemetry.addData("Hue", colorSS.getHue());
+                telemetry.addData("Saturation", colorSS.getSaturation());
+                telemetry.addData("Value", colorSS.getValue());
+                telemetry.addData("Distance (cm)", colorSS.getDistance());
+            }
+            else {
+                telemetry.addLine("ColorSS disabled");
+            }
         }
 
         if (enabled[7]) {

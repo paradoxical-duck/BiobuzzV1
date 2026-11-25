@@ -1,16 +1,21 @@
 package org.firstinspires.ftc.teamcode.scrimmage3.teleOp;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.hardware.PrintData;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
+import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 
-@TeleOp(name = "duckY")
+@TeleOp(name = "ducky")
 public class Scrimmage3Tele extends LinearOpMode {
     IntakeSS intakeSS;
     ShooterSS shooterSS;
@@ -22,20 +27,48 @@ public class Scrimmage3Tele extends LinearOpMode {
     boolean shooterEnabled = false;
     boolean intakeEnabled = false;
     boolean intakeReversed = false;
+    boolean trackingEnabled = false;
+    boolean shooterPaused = false;
 
     //***edge detection***
     boolean lastFrontBeam = false;
     boolean lastPollenBeam = false;
 
-    //*TODO COUNT VARIABLE
+    //TODO COUNT VARIABLE
     public static int ballCount;
 
-    //*TODO BALL COLORS
+    //TODO BALL COLORS
     boolean isShooting = false;
+
+    boolean finishingShot = false;
+    ElapsedTime finishTimer = new ElapsedTime();
+    public static double finishDelayMs = 100;
+
+    void resetGamepads() {
+        robot.currentGamepad1.copy(gamepad1);
+        robot.previousGamepad1.copy(gamepad1);
+        robot.currentGamepad2.copy(gamepad2);
+        robot.previousGamepad2.copy(gamepad2);
+    }
 
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
+
+        resetGamepads();
+        PrintData.reset();
+
+        red = RobotHardware.isRed();
+        shooterEnabled = false;
+        intakeEnabled = false;
+        intakeReversed = false;
+        trackingEnabled = false;
+        shooterPaused = false;
+        isShooting = false;
+        finishingShot = false;
+        lastFrontBeam = false;
+        lastPollenBeam = false;
+        finishTimer.reset();
 
         //***subsystems***
         intakeSS = new IntakeSS(robot);
@@ -44,19 +77,23 @@ public class Scrimmage3Tele extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
 
-        shooterSS.setAutoS3Up(false);
         shooterSS.updateState(ShooterSS.ShooterState.INIT);
         shooterSS.updateState(ShooterSS.HoodState.SHOOT);
         shooterSS.updateState(ShooterSS.TurretState.SHOOT);
         shooterSS.updateState(ShooterSS.LockState.LOCKED);
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
 
+        robot.turret1.setPosition(0.5);
+        robot.turret2.setPosition(0.5);
+
         ballCount = 0;
 
         while (opModeInInit()) {
+            robot.readGamepads(gamepad1, gamepad2);
+
             red = RobotHardware.isRed();
             //alliance selection carried over from auto but can still be manually changed
-            if (gamepad1.left_bumper && !robot.previousGamepad1.left_bumper) {
+            if (robot.currentGamepad1.left_bumper && !robot.previousGamepad1.left_bumper) {
                 red = !red;
             }
 
@@ -71,10 +108,12 @@ public class Scrimmage3Tele extends LinearOpMode {
             telemetry.addLine("Initialized");
             telemetry.addLine(RobotHardware.getAlliance() + " alliance active");
             telemetry.update();
-            robot.previousGamepad1.copy(gamepad1);
         }
 
+        new TrackingSS(robot, follower, RobotHardware.getAlliance());
+
         waitForStart();
+        resetGamepads();
         robot.clearBulkCache();
 
         lastFrontBeam = robot.frontBeam.getState();
@@ -86,13 +125,57 @@ public class Scrimmage3Tele extends LinearOpMode {
 
         while (opModeIsActive()) {
             robot.clearBulkCache();
+            robot.update();
+            robot.readGamepads(gamepad1, gamepad2);
 
-            follower.manual(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            Gamepad g1 = robot.currentGamepad1;
+            Gamepad g2 = robot.currentGamepad2;
+            Gamepad p1 = robot.previousGamepad1;
+            Gamepad p2 = robot.previousGamepad2;
+
+            follower.manual(ManualDrive.fieldCentric(
+                    -g1.left_stick_y,
+                    -g1.left_stick_x,
+                    -g1.right_stick_x,
+                    follower.pose().heading()
+            ));
             follower.update();
 
-            //*todo intake logic
-            if (gamepad1.right_bumper && !robot.previousGamepad1.right_bumper) {
-                intakeEnabled = !intakeEnabled;
+            if (g2.a && !p2.a) {
+                follower.setPose(new Pose(red ? 0 : 141.5, 0, follower.pose().heading()));
+                TrackingSS.resetHiveSelection();
+            }
+
+            if (g2.b && !p2.b) {
+                follower.setPose(new Pose(red ? 0 : 141.5, 141.5, follower.pose().heading()));
+                TrackingSS.resetHiveSelection();
+            }
+
+            TrackingSS.setDxAndDy();
+
+            if (g2.back && !p2.back) {
+                TrackingSS.toggleHive();
+            }
+
+            if (g2.start && !p2.start) {
+                trackingEnabled = !trackingEnabled;
+
+                if (trackingEnabled) {
+                    shooterSS.setPollenTurretTarget(TrackingSS.getPollenTurretPos());
+                    shooterSS.updatePollenState(ShooterSS.TurretState.TRACKING_ENABLED);
+                }
+                else {
+                    shooterSS.updatePollenState(ShooterSS.TurretState.SHOOT);
+                }
+            }
+
+            if (trackingEnabled) {
+                shooterSS.setPollenTurretTarget(TrackingSS.getPollenTurretPos());
+            }
+
+            //todo intake logic
+            if (!isShooting && g1.right_bumper && !p1.right_bumper) {
+                intakeEnabled = !intakeEnabled || intakeReversed;
                 intakeReversed = false;
 
                 if (intakeEnabled && ballCount < 4) {
@@ -104,7 +187,7 @@ public class Scrimmage3Tele extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.x && !robot.previousGamepad1.x) {
+            if (!isShooting && g1.x && !p1.x) {
                 intakeReversed = !intakeReversed;
                 intakeEnabled = intakeReversed;
 
@@ -116,12 +199,13 @@ public class Scrimmage3Tele extends LinearOpMode {
                 }
             }
 
-            //*todo intake beambreaker logic
+            //todo intake beambreaker logic
             boolean frontBeam = robot.frontBeam.getState();
             boolean pollenBeam = robot.pollenBeam.getState();
 
             if (!frontBeam && lastFrontBeam && ballCount < 4) {
                 ballCount++;
+                shooterPaused = false;
             }
 
             /* if front beam not tripped, then lastFrontbeam = true, else if front beam tripped, then last front beam = false
@@ -135,7 +219,7 @@ public class Scrimmage3Tele extends LinearOpMode {
             lastFrontBeam = frontBeam;
             lastPollenBeam = pollenBeam;
 
-            if (ballCount == 4 && intakeEnabled && !intakeReversed) {
+            if (ballCount == 4 && intakeEnabled && !intakeReversed && !isShooting) {
                 if (!pollenBeam) {
                     if (intakeSS.getIntakeState() != IntakeSS.IntakeState.INIT) {
                         intakeSS.updateState(IntakeSS.IntakeState.INIT);
@@ -148,58 +232,79 @@ public class Scrimmage3Tele extends LinearOpMode {
                 }
             }
 
-            if (ballCount >= 1 && !shooterEnabled) {
+            if (ballCount >= 1 && !shooterEnabled && !shooterPaused) {
                 shooterEnabled = true;
-                shooterSS.updatePollenState(ShooterSS.ShooterState.AUTO_S3);
+                shooterSS.updatePollenState(ShooterSS.ShooterState.ON);
             }
-            else if (ballCount == 0 && shooterEnabled) {
+            else if (ballCount == 0 && shooterEnabled && !isShooting) {
                 shooterEnabled = false;
                 shooterSS.updatePollenState(ShooterSS.ShooterState.INIT);
             }
 
-            if (gamepad1.a && !robot.previousGamepad1.a && ballCount > 0) {
+            if (g1.left_bumper && !p1.left_bumper && ballCount > 0 && !isShooting) {
+                shooterPaused = false;
+
+                if (!shooterEnabled) {
+                    shooterEnabled = true;
+                    shooterSS.updatePollenState(ShooterSS.ShooterState.ON);
+                }
+
                 shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED);
+                intakeSS.updateState(IntakeSS.IntakeState.ON);
+                intakeReversed = false;
                 isShooting = true;
+                finishingShot = false;
             }
 
-            if (isShooting && ballCount == 0) {
-                shooterSS.updateState(ShooterSS.LockState.LOCKED);
+            if (isShooting) {
+                if (ballCount == 0) {
+                    if (!finishingShot) {
+                        finishingShot = true;
+                        finishTimer.reset();
+                    }
+
+                    if (finishTimer.milliseconds() >= finishDelayMs) {
+                        shooterSS.updateState(ShooterSS.LockState.LOCKED);
+                        shooterSS.updatePollenState(ShooterSS.ShooterState.INIT);
+
+                        isShooting = false;
+                        finishingShot = false;
+                        shooterEnabled = false;
+
+                        intakeSS.updateState(intakeEnabled ? IntakeSS.IntakeState.ON : IntakeSS.IntakeState.INIT);
+
+                        lastFrontBeam = robot.frontBeam.getState();
+                    }
+                }
+                else {
+                    finishingShot = false;
+                }
+            }
+
+            if (g1.back && !p1.back) {
+                intakeEnabled = false;
+                intakeReversed = false;
+                shooterEnabled = false;
+                shooterPaused = true;
                 isShooting = false;
-                lastFrontBeam = robot.frontBeam.getState();
+                finishingShot = false;
+
+                finishTimer.reset();
+
+                intakeSS.updateState(IntakeSS.IntakeState.INIT);
+                shooterSS.updateState(ShooterSS.ShooterState.INIT);
+                shooterSS.updateState(ShooterSS.LockState.LOCKED);
             }
 
-            telemetry.addLine("******** CRITICAL INFO ********");
-            telemetry.addData("Alliance", RobotHardware.getAlliance());
-            telemetry.addData("Ball count", ballCount);
-            telemetry.addData("Shooter enabled", shooterEnabled);
-            telemetry.addData("Shooting", isShooting);
-            telemetry.addData("Intake state", intakeSS.getIntakeState());
-
-            telemetry.addLine("******** BEAMBREAKERS ********");
-            telemetry.addData("Front beam", frontBeam);
-            telemetry.addData("Pollen beam", pollenBeam);
-
-            telemetry.addLine("******** SHOOTER ********");
-            telemetry.addData("Shooter state", shooterSS.getPollenShooterState());
-            telemetry.addData("Shooter power", robot.shooter1.getPower());
-            telemetry.addData("Shooter velocity", robot.shooter1.getVelocity());
-            telemetry.addData("Shooter current", robot.amps(robot.shooter1));
-            telemetry.addData("Lock state", shooterSS.getLockState());
-
-            telemetry.addLine("******** TURRET AND HOOD ********");
-            telemetry.addData("Turret position", robot.turret1.getPosition());
-            telemetry.addData("Hood position", robot.hood1.getPosition());
-
-            telemetry.addLine("******** POSE ********");
-            telemetry.addData("X", follower.pose().x());
-            telemetry.addData("Y", follower.pose().y());
-            telemetry.addData("Heading", Math.toDegrees(follower.pose().heading()));
+            PrintData.menu(g2, p2, telemetry);
+            PrintData.print(robot, follower, intakeSS, shooterSS, null, trackingEnabled, shooterEnabled, ballCount, telemetry);
 
             telemetry.update();
-            robot.previousGamepad1.copy(gamepad1);
         }
 
         shooterSS.updateState(ShooterSS.ShooterState.INIT);
+        shooterSS.updateState(ShooterSS.LockState.LOCKED);
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
+        TrackingSS.resetHiveSelection();
     }
 }

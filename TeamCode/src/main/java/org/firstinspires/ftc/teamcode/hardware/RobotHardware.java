@@ -103,10 +103,10 @@ public class RobotHardware {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
         //TODO =====  INTAKE=====
-       intake1 = hardwareMap.get(DcMotorEx.class, "intake1");
-       intake2 = hardwareMap.get(DcMotorEx.class, "intake2");
-       intake1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-       intake2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake1 = hardwareMap.get(DcMotorEx.class, "intake1");
+        intake2 = hardwareMap.get(DcMotorEx.class, "intake2");
+        intake1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake1.setDirection(DcMotorSimple.Direction.FORWARD);
         intake2.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -127,10 +127,11 @@ public class RobotHardware {
 //        shooter1.setVelocityPIDFCoefficients(P, I, D, F);
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        applyShooterPIDF();
 
         //TODO =====  FEEDER LOCKS  =====
-       feedLock1 = hardwareMap.get(ServoImplEx.class, "feedLock1");  //Pollen
-       feedLock2 = hardwareMap.get(ServoImplEx.class, "feedLock2");  //Nectar
+        feedLock1 = hardwareMap.get(ServoImplEx.class, "feedLock1");  //Pollen
+        feedLock2 = hardwareMap.get(ServoImplEx.class, "feedLock2");  //Nectar
 
 
         //TODO =====  BEAM BREAKERS  =====
@@ -190,8 +191,12 @@ public class RobotHardware {
 
     /** Re-applies the PIDF values from Globals, so Panels edits take effect. */
     public void applyShooterPIDF() {
-        shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);
-        shooter2.setVelocityPIDFCoefficients(Globals.kP_Nectar, Globals.kI_Nectar, Globals.kD_Nectar, Globals.kF_Nectar);
+        if (Globals.kP_Pollen != 0 || Globals.kI_Pollen != 0 || Globals.kD_Pollen != 0 || Globals.kF_Pollen != 0) {
+            shooter1.setVelocityPIDFCoefficients(Globals.kP_Pollen, Globals.kI_Pollen, Globals.kD_Pollen, Globals.kF_Pollen);
+        }
+        if (Globals.kP_Nectar != 0 || Globals.kI_Nectar != 0 || Globals.kD_Nectar != 0 || Globals.kF_Nectar != 0) {
+            shooter2.setVelocityPIDFCoefficients(Globals.kP_Nectar, Globals.kI_Nectar, Globals.kD_Nectar, Globals.kF_Nectar);
+        }
     }
 
     /** Stops every motor. Use at the end of an auto or in an emergency. */

@@ -34,14 +34,14 @@ public class TrackingTestV1 extends LinearOpMode {
 
     int selected = 0;
     int hiveMode = 0;
-    double step = 0.01;
+    double step = 50;
 
     public static Pose startPose = new Pose(0, 0, 0);
 
     String[] labels = {
-            "Pollen base power",
+            "Pollen base velocity (ticks/s)",
             "Pollen base hood",
-            "Pollen power/in",
+            "Pollen velocity/in (ticks/s/in)",
             "Pollen hood/in",
             "Pollen turret offset deg"
     };
@@ -58,7 +58,7 @@ public class TrackingTestV1 extends LinearOpMode {
 
     void setValue(int index, double value) {
         switch (index) {
-            case 0: Globals.shooterOnPollen = Range.clip(value, 0, 1); break;
+            case 0: Globals.shooterOnPollen = Math.max(0, value); break;
             case 1: Globals.hoodShootPosPollen = Range.clip(value, 0, 1); break;
             case 2: TrackingSS.rpmPerInchPollen = value; break;
             case 3: TrackingSS.hoodPerInchPollen = value; break;
@@ -75,7 +75,7 @@ public class TrackingTestV1 extends LinearOpMode {
         turret1 = robot.turret1;
         hood1 = robot.hood1;
 
-        shooter1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
 
@@ -117,7 +117,10 @@ public class TrackingTestV1 extends LinearOpMode {
             if (gamepad1.back && !lastBack) interpolEnabled = !interpolEnabled;
             if (gamepad1.a && !lastA) shooterEnabled = !shooterEnabled;
 
-            if (gamepad1.left_bumper && !lastLB) selected = (selected + 1) % labels.length;
+            if (gamepad1.left_bumper && !lastLB) {
+                selected = (selected + 1) % labels.length;
+                step = selected == 0 ? 50 : selected == 2 ? 1 : selected == 4 ? 1 : 0.01;
+            }
 
             if (gamepad1.right_bumper && !lastRB) {
                 intakeEnabled = !intakeEnabled;
@@ -161,10 +164,10 @@ public class TrackingTestV1 extends LinearOpMode {
 
             TrackingSS.interpolate();
 
-            double targetPower = shooterEnabled ? Range.clip(interpolEnabled ? TrackingSS.getTargetRpmPollen() : Globals.shooterOnPollen, 0, 1) : 0;
+            double targetVelocity = shooterEnabled ? Math.max(0, interpolEnabled ? TrackingSS.getTargetRpmPollen() : Globals.shooterOnPollen) : 0;
             double targetHood = Range.clip(interpolEnabled ? TrackingSS.getTargetHoodPollen() : Globals.hoodShootPosPollen, 0, 1);
 
-            shooter1.setPower(targetPower);
+            shooter1.setVelocity(targetVelocity);
             hood1.setPosition(targetHood);
 
             telemetry.addLine("******** CONTROLS ********");
@@ -210,9 +213,9 @@ public class TrackingTestV1 extends LinearOpMode {
             }
 
             telemetry.addLine("******** SHOOTER ********");
-            telemetry.addData("Target power", targetPower);
-            telemetry.addData("Current power", shooter1.getPower());
-            telemetry.addData("Velocity (ticks/s)", shooter1.getVelocity());
+            telemetry.addData("Target velocity (ticks/s)", targetVelocity);
+            telemetry.addData("Motor output power", shooter1.getPower());
+            telemetry.addData("Actual velocity (ticks/s)", shooter1.getVelocity());
             telemetry.addData("Current (A)", shooter1.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("Hood", hood1.getPosition());
 
@@ -224,7 +227,7 @@ public class TrackingTestV1 extends LinearOpMode {
             telemetry.update();
         }
 
-        shooter1.setPower(0);
+        shooter1.setVelocity(0);
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
         TrackingSS.overrideHive = false;
     }

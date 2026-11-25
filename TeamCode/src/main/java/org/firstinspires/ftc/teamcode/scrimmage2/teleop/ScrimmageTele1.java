@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.scrimmage2.teleop;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
 
 @TeleOp(name = "Scrimmage Tele")
+@Disabled
 public class ScrimmageTele1 extends LinearOpMode {
     IntakeSS intakeSS;
     Follower follower;

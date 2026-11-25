@@ -23,16 +23,16 @@ public class TrackingSS {
     public static double kS_Pollen = 0.015;
     public static double kS_Nectar = 0.015;
 
-    public static double turretLeftPollen = 0.93;
-    public static double turretRightPollen = 0.34;
+    public static double turretLeftPollen = 0.72;
+    public static double turretRightPollen = 0.28;
     public static double turretLeftNectar = 0.1283;
     public static double turretRightNectar = 0.9561;
 
     public static double currentPollen = Globals.turretInit;
     public static double currentNectar = Globals.turretInit;
 
-    public static double turretMinAnglePollen = -180;
-    public static double turretMaxAnglePollen = 75;
+    public static double turretMinAnglePollen = -90;
+    public static double turretMaxAnglePollen = 90;
     public static double turretMinAngleNectar = -42.9;
     public static double turretMaxAngleNectar = 249.2;
 
@@ -51,6 +51,8 @@ public class TrackingSS {
     public static boolean upperHive = false;
     public static boolean overrideHive = false;
     public static boolean overrideUpperHive = false;
+    private static boolean lastUpperHalf = false;
+
     public static double goalX = 0;
     public static double goalY = 0;
     public static double targetHeading = 0;
@@ -78,18 +80,43 @@ public class TrackingSS {
         TrackingSS.alliance = alliance;
         currentPollen = robot.turret1.getPosition();
         currentNectar = robot.turret2.getPosition();
+        resetHiveSelection();
     }
 
     public TrackingSS(Follower follower, boolean red) {
         TrackingSS.follower = follower;
         TrackingSS.alliance = red ? RobotHardware.Alliance.RED : RobotHardware.Alliance.BLUE;
+        resetHiveSelection();
+    }
+
+    public static void resetHiveSelection() {
+        overrideHive = false;
+        lastUpperHalf = follower.pose().y() > 70.75;
+        overrideUpperHive = lastUpperHalf;
+        setDxAndDy();
+    }
+
+    public static void toggleHive() {
+        setDxAndDy();
+
+        overrideUpperHive = !upperHive;
+        overrideHive = overrideUpperHive != lastUpperHalf;
+
+        setDxAndDy();
     }
 
     public static void setDxAndDy() {
         double robotX = follower.pose().x();
         double robotY = follower.pose().y();
 
-        upperHive = overrideHive ? overrideUpperHive : robotY > 70.75;
+        boolean upperHalf = robotY > 70.75;
+
+        if (upperHalf != lastUpperHalf) {
+            overrideHive = false;
+            lastUpperHalf = upperHalf;
+        }
+
+        upperHive = overrideHive ? overrideUpperHive : upperHalf;
 
         Pose goal;
 
@@ -292,16 +319,14 @@ public class TrackingSS {
 
         double distanceError = rangeVal - referenceDist;
 
-        targetRpmPollen = Range.clip(
-                Globals.shooterOnPollen + distanceError * rpmPerInchPollen,
+        targetRpmPollen = Math.max(
                 0.0,
-                1.0
+                Globals.shooterOnPollen + distanceError * rpmPerInchPollen
         );
 
-        targetRpmNectar = Range.clip(
-                Globals.shooterOnNectar + distanceError * rpmPerInchNectar,
+        targetRpmNectar = Math.max(
                 0.0,
-                1.0
+                Globals.shooterOnNectar + distanceError * rpmPerInchNectar
         );
 
         targetHoodPollen = Range.clip(
@@ -339,6 +364,17 @@ public class TrackingSS {
 
     public static double getTargetHood() {
         return targetHoodPollen;
+    }
+
+    public static void updatePollenTracking(ShooterSS shooterSS) {
+        currentPollen = robot.turret1.getPosition();
+
+        shooterSS.setPollenTurretTarget(getPollenTurretPos());
+
+        interpolate();
+
+        shooterSS.setPollenShooterTarget(getTargetRpmPollen());
+        shooterSS.setPollenHoodTarget(getTargetHoodPollen());
     }
 
     public static void updateTracking(ShooterSS shooterSS) {

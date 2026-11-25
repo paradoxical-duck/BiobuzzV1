@@ -5,7 +5,7 @@ import com.pedropathing.math.Pose;
 public class Globals {
 
     //todo intake
-    public static double intakeOn = 1;
+    public static double intakeOn = 0.7;
     public static double intakeOff = 0;
     public static double intakeRev = -1;
 
@@ -16,13 +16,13 @@ public class Globals {
     public static double hoodInit = 0.33;
 
     //todo shooter ss pollen
-    public static double shooterOnPollen = 0.5;
+    public static double shooterOnPollen = 1550; //1630 //1600 //1650
 
     public static double turretShootPosPollen = 0.5;
-    public static double hoodShootPosPollen = 0.33;
+    public static double hoodShootPosPollen = 0.43;
 
     //todo shooter ss nectar
-    public static double shooterOnNectar = 0.5;
+    public static double shooterOnNectar = 1000;
     public static double turretShootPosNectar = 0.5;
     public static double hoodShootPosNectar = 0.33;
 
@@ -54,12 +54,12 @@ public class Globals {
     public static double flowerAndShootDelayMs = 4000;
 
     //todo auto values pollen
-    public static double autoShootPollen = 0.5;
+    public static double autoShootPollen = 1000;
     public static double autoTurretPollen = 0.5;
     public static double autoHoodPollen = 0.33;
 
     //todo auto values nectar
-    public static double autoShootNectar = 0.5;
+    public static double autoShootNectar = 1000;
     public static double autoTurretNectar = 0.5;
     public static double autoHoodNectar = 0.33;
 
@@ -74,10 +74,10 @@ public class Globals {
     public static double blueNectarHueTolerance = 20;
 
     //todo shooter pidf values pollen
-    public static double kP_Pollen = 0;
+    public static double kP_Pollen = 30;
     public static double kI_Pollen = 0;
     public static double kD_Pollen = 0;
-    public static double kF_Pollen = 0;
+    public static double kF_Pollen = 12.8; //12.5
 
     //todo shooter pidf values nectar
     public static double kP_Nectar = 0;
@@ -86,8 +86,8 @@ public class Globals {
     public static double kF_Nectar = 0;
 
     //TODO AUTO VALUES SCRIMMAGE 3
-    public static double pollenShootDown = 0.6;
-    public static double pollenShootUp = 0.6;
+    public static double pollenShootDown = 1000;
+    public static double pollenShootUp = 1000;
     public static double pollenTurretDown = 0.5;
     public static double pollenTurretUp = 0.5;
     public static double pollenHoodUp = 0.33;
