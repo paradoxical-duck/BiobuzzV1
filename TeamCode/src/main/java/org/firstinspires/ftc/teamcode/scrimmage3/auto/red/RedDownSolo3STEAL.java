@@ -33,6 +33,13 @@ public class RedDownSolo3STEAL extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(AutoConstants.redDownStartPose);
 
+        shooterSS.updateState(ShooterSS.ShooterState.INIT);
+        shooterSS.updateState(ShooterSS.HoodState.SHOOT);
+        shooterSS.updateState(ShooterSS.TurretState.SHOOT);
+        shooterSS.updateState(ShooterSS.LockState.LOCKED);
+        intakeSS.updateState(IntakeSS.IntakeState.INIT);
+        intakeSS.updateState(IntakeSS.FlowerRampState.INIT);
+
         Scheduler.reset();
         waitForStart();
 

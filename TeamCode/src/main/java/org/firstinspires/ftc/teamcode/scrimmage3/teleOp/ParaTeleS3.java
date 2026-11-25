@@ -83,6 +83,7 @@ public class ParaTeleS3 extends LinearOpMode {
         shooterSS.updateState(ShooterSS.TurretState.SHOOT);
         shooterSS.updateState(ShooterSS.LockState.LOCKED);
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
+        intakeSS.updateState(IntakeSS.FlowerRampState.INIT);
 
         robot.turret1.setPosition(0.5);
         robot.turret2.setPosition(0.5);
@@ -296,6 +297,14 @@ public class ParaTeleS3 extends LinearOpMode {
                 }
                 else {
                     finishingShot = false;
+                }
+            }
+            if (gamepad1.x && !previousGamepad1.x) {
+                if (intakeSS.getFlowerRampState() != IntakeSS.FlowerRampState.DEPLOYED) {
+                    intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED);
+                }
+                else {
+                    intakeSS.updateState(IntakeSS.FlowerRampState.UP);
                 }
             }
 

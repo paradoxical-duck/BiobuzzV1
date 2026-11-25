@@ -33,6 +33,13 @@ public class BlueUpSolo2 extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(AutoConstants.blueDownStartPose);
 
+        shooterSS.updateState(ShooterSS.ShooterState.INIT);
+        shooterSS.updateState(ShooterSS.HoodState.SHOOT);
+        shooterSS.updateState(ShooterSS.TurretState.SHOOT);
+        shooterSS.updateState(ShooterSS.LockState.LOCKED);
+        intakeSS.updateState(IntakeSS.IntakeState.INIT);
+        intakeSS.updateState(IntakeSS.FlowerRampState.INIT);
+
         Scheduler.reset();
         waitForStart();
 
