@@ -55,5 +55,6 @@ public class BlueUpSolo3 extends LinearOpMode {
             telemetry.addData("Follower Mode", follower.mode());
             telemetry.update();
         }
+        RobotHardware.currentPose = follower.pose();
     }
 }

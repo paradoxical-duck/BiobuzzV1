@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.pedropathing.api.PoseFactory;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -86,6 +87,7 @@ public class RobotHardware {
     private HardwareMap hardwareMap ;
 
     public static RobotHardware instance = null;
+    public static Pose currentPose = new Pose(0,0,0);
 
     public static RobotHardware getInstance() {
         if (instance == null) {
@@ -217,4 +219,5 @@ public class RobotHardware {
                 nectarBeam.getState() &&
                 midBeam.getState();
     }
+
 }

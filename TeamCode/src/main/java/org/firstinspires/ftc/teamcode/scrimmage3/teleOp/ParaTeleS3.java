@@ -76,6 +76,7 @@ public class ParaTeleS3 extends LinearOpMode {
         shooterSS = new ShooterSS(robot);
 
         follower = Constants.create(hardwareMap);
+        startPose = RobotHardware.currentPose != null ? RobotHardware.currentPose : new Pose(0, 0, 0); //todo set pose after auto
         follower.setPose(startPose);
 
         shooterSS.updateState(ShooterSS.ShooterState.INIT);
@@ -108,8 +109,32 @@ public class ParaTeleS3 extends LinearOpMode {
                 RobotHardware.setAlliance(RobotHardware.Alliance.BLUE);
             }
 
+            if (robot.currentGamepad1.a && !robot.previousGamepad1.a) {
+                startPose = new Pose(0, 0, startPose.heading());
+                follower.setPose(startPose);
+            }
+            else if (robot.currentGamepad1.b && !robot.previousGamepad1.b) {
+                startPose = new Pose(141.5, 0, startPose.heading());
+                follower.setPose(startPose);
+            }
+            else if (robot.currentGamepad1.x && !robot.previousGamepad1.x) {
+                startPose = new Pose(0, 141.5, startPose.heading());
+                follower.setPose(startPose);
+            }
+            else if (robot.currentGamepad1.y && !robot.previousGamepad1.y) {
+                startPose = new Pose(141.5, 141.5, startPose.heading());
+                follower.setPose(startPose);
+            }
+
             telemetry.addLine("Initialized");
             telemetry.addLine(RobotHardware.getAlliance() + " alliance active");
+
+            telemetry.addLine("***Starting Pose***");
+            telemetry.addLine("A: (0, 0) | B: (141.5, 0)");
+            telemetry.addLine("X: (0, 141.5) | Y: (141.5, 141.5)");
+            telemetry.addData("Starting X", startPose.x());
+            telemetry.addData("Starting Y", startPose.y());
+            telemetry.addData("Starting heading", Math.toDegrees(startPose.heading()));
 
             PrintData.menu(robot.currentGamepad1, robot.previousGamepad1, telemetry);
 
@@ -299,7 +324,8 @@ public class ParaTeleS3 extends LinearOpMode {
                     finishingShot = false;
                 }
             }
-            if (gamepad1.x && !previousGamepad1.x) {
+
+            if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
                 if (intakeSS.getFlowerRampState() != IntakeSS.FlowerRampState.DEPLOYED) {
                     intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED);
                 }
