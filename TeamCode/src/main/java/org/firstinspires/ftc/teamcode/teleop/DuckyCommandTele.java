@@ -50,15 +50,20 @@ import org.firstinspires.ftc.teamcode.subsystems.turret1_ss;
  *   BACK              STOP ALL: intake off, deploy UP, shooter off, lock closed,
  *                     shooter auto-start paused until next ball is counted.
  *
- * ======================= GAMEPAD2 =======================
- *   A                 reset pose: bottom corner of your alliance
- *                       RED (9, 9, 0)        BLUE (132.5, 9, 180)
- *   B                 reset pose: top corner of your alliance
- *                       RED (9, 132.5, 0)    BLUE (132.5, 132.5, 180)
+ * ======================= TURRET / POSE (gamepad1) =======================
+ *   Y                 turret1 tracking on / off (off = turret centred)
+ *   B                 turret1 goal: AUTO (by field half) -> FORCE_UP -> FORCE_DOWN
+ *   RIGHT STICK BTN   reset pose: corner on YOUR RIGHT (seen from your drive wall)
+ *                       RED (9, 9, 0)            BLUE (132.5, 132.5, 180)
+ *   LEFT STICK BTN    reset pose: corner on YOUR LEFT
+ *                       RED (9, 132.5, 0)        BLUE (132.5, 9, 180)
  *                     Push the robot into the corner facing into the field first.
- *   START             turret1 tracking on / off (off = turret centred)
- *   BACK              turret1 goal: AUTO (by field half) -> FORCE_UP -> FORCE_DOWN
- *   DPAD UP/DOWN      telemetry menu select, DPAD RIGHT toggle section (PrintData)
+ *
+ * ======================= TELEMETRY MENU (gamepad1) =======================
+ *   DPAD UP/DOWN      select section, DPAD RIGHT toggle section (PrintData)
+ *
+ *   A and START are free (START + A together is the Driver Station pairing combo).
+ *   Gamepad2 is not used.
  *
  * Live values: Dashboard Config -> DuckyCommandTele / Panels Configurables.
  */
@@ -77,10 +82,11 @@ public class DuckyCommandTele extends CommandOpMode {
     public static double SHOOT_TIMEOUT_MS = 3000; // safety if a beam misses a ball
     public static int RUMBLE_MS = 300;
 
-    public static double RED_BOTTOM_X = 9, RED_BOTTOM_Y = 9, RED_BOTTOM_H = 0;
-    public static double RED_TOP_X = 9, RED_TOP_Y = 132.5, RED_TOP_H = 0;
-    public static double BLUE_BOTTOM_X = 132.5, BLUE_BOTTOM_Y = 9, BLUE_BOTTOM_H = 180;
-    public static double BLUE_TOP_X = 132.5, BLUE_TOP_Y = 132.5, BLUE_TOP_H = 180;
+    // Corner reset poses (x, y inches, heading deg), same as Turret1SSTest
+    public static double RED_RS_X = 9,      RED_RS_Y = 9,      RED_RS_H = 0;    // RED  right stick btn
+    public static double RED_LS_X = 9,      RED_LS_Y = 132.5,  RED_LS_H = 0;    // RED  left stick btn
+    public static double BLUE_RS_X = 132.5, BLUE_RS_Y = 132.5, BLUE_RS_H = 180; // BLUE right stick btn
+    public static double BLUE_LS_X = 132.5, BLUE_LS_Y = 9,     BLUE_LS_H = 180; // BLUE left stick btn
 
     public static int ballCount = 0;
 
@@ -90,7 +96,7 @@ public class DuckyCommandTele extends CommandOpMode {
     private ShooterSS shooterSS;
     private turret1_ss turret1;
     private Follower follower;
-    private GamepadEx g1, g2;
+    private GamepadEx g1;
 
     // ---------- state ----------
     private boolean intakeEnabled = false;
@@ -120,7 +126,6 @@ public class DuckyCommandTele extends CommandOpMode {
         ballCount = 0;
 
         g1 = new GamepadEx(gamepad1);
-        g2 = new GamepadEx(gamepad2);
         bindButtons();
 
         // Init positions are only sent at Start (see firstRun below)
@@ -143,7 +148,7 @@ public class DuckyCommandTele extends CommandOpMode {
     public void run() {
         robot.clearBulkCache();
         robot.update();
-        robot.readGamepads(gamepad1, gamepad2); // for PrintData menu
+        robot.readGamepads(gamepad1, gamepad2); // for PrintData menu (gamepad1)
 
         if (firstRun) {
             onStart();
@@ -160,7 +165,7 @@ public class DuckyCommandTele extends CommandOpMode {
 
         turret1.update(follower.pose());
 
-        PrintData.menu(robot.currentGamepad2, robot.previousGamepad2, telemetry);
+        PrintData.menu(robot.currentGamepad1, robot.previousGamepad1, telemetry);
         PrintData.print(robot, follower, intakeSS, shooterSS, null, turret1.tracking, shooterEnabled, ballCount, telemetry);
         telemetry.addData("Balls", ballCount);
         telemetry.addData("Intake", intakeReversed ? "REVERSE" : intakeEnabled ? "ON" : "OFF");
@@ -197,15 +202,15 @@ public class DuckyCommandTele extends CommandOpMode {
         g1.getGamepadButton(GamepadKeys.Button.BACK)
                 .whenPressed(new InstantCommand(this::stopAll));
 
-        // ---- gamepad2 ----
-        g2.getGamepadButton(GamepadKeys.Button.A)
-                .whenPressed(new InstantCommand(() -> cornerReset(false)));
-        g2.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new InstantCommand(() -> cornerReset(true)));
-        g2.getGamepadButton(GamepadKeys.Button.START)
+        // ---- turret / pose (gamepad1) ----
+        g1.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new InstantCommand(() -> schedule(turret1.trackCommand(!turret1.tracking))));
-        g2.getGamepadButton(GamepadKeys.Button.BACK)
+        g1.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new InstantCommand(turret1::cycleGoalMode));
+        g1.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+                .whenPressed(new InstantCommand(() -> cornerReset(true)));
+        g1.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON)
+                .whenPressed(new InstantCommand(() -> cornerReset(false)));
     }
 
     // ======================= DRIVE =======================
@@ -220,17 +225,18 @@ public class DuckyCommandTele extends CommandOpMode {
         follower.update();
     }
 
-    private void cornerReset(boolean top) {
+    /** Corner pose reset for the current alliance (right / left as seen from your drive wall). */
+    private void cornerReset(boolean rightStick) {
         boolean red = RobotHardware.isRed();
         double x, y, h;
         if (red) {
-            x = top ? RED_TOP_X : RED_BOTTOM_X;
-            y = top ? RED_TOP_Y : RED_BOTTOM_Y;
-            h = top ? RED_TOP_H : RED_BOTTOM_H;
+            x = rightStick ? RED_RS_X : RED_LS_X;
+            y = rightStick ? RED_RS_Y : RED_LS_Y;
+            h = rightStick ? RED_RS_H : RED_LS_H;
         } else {
-            x = top ? BLUE_TOP_X : BLUE_BOTTOM_X;
-            y = top ? BLUE_TOP_Y : BLUE_BOTTOM_Y;
-            h = top ? BLUE_TOP_H : BLUE_BOTTOM_H;
+            x = rightStick ? BLUE_RS_X : BLUE_LS_X;
+            y = rightStick ? BLUE_RS_Y : BLUE_LS_Y;
+            h = rightStick ? BLUE_RS_H : BLUE_LS_H;
         }
         follower.setPose(new Pose(x, y, Math.toRadians(h)));
     }
