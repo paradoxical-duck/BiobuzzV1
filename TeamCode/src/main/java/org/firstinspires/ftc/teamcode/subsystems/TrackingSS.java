@@ -105,7 +105,7 @@ public class TrackingSS {
         setDxAndDy();
     }
 
-    public void setDxAndDy() {
+    public static void setDxAndDy() {
         double robotX = follower.pose().x();
         double robotY = follower.pose().y();
 
@@ -138,7 +138,7 @@ public class TrackingSS {
         dy = goalY - robotY;
     }
 
-    public double getReachableTurretAngle(double requested, double minAngle, double maxAngle) {
+    public static double getReachableTurretAngle(double requested, double minAngle, double maxAngle) {
         for (int i = -2; i <= 2; i++) {
             double candidate = requested + 360 * i;
 
@@ -166,7 +166,7 @@ public class TrackingSS {
     }
 
     //todo ****************** TURRET TRACKING *******************
-    public double getPollenTurretPos() {
+    public static double getPollenTurretPos() {
         setDxAndDy();
 
         targetHeading = Math.toDegrees(Math.atan2(dy, dx));
@@ -212,7 +212,7 @@ public class TrackingSS {
         return currentPollen;
     }
 
-    public double getNectarTurretPos() {
+    public static double getNectarTurretPos() {
         setDxAndDy();
 
         double heading = Math.toDegrees(Math.atan2(dy, dx));
@@ -260,7 +260,7 @@ public class TrackingSS {
         return getPollenTurretPos();
     }
 
-    public double getPollenTurret() {
+    public static double getPollenTurret() {
         return map(
                 currentPollen,
                 turretLeftPollen,
@@ -270,7 +270,7 @@ public class TrackingSS {
         );
     }
 
-    public double getNectarTurret() {
+    public static double getNectarTurret() {
         return map(
                 currentNectar,
                 turretLeftNectar,
@@ -284,11 +284,11 @@ public class TrackingSS {
         return getPollenTurret();
     }
 
-    public double map(double val, double inMin, double inMax, double outMin, double outMax) {
+    public static double map(double val, double inMin, double inMax, double outMin, double outMax) {
         return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     }
 
-    public double angleWrap(double error) {
+    public static double angleWrap(double error) {
         while (error > Math.PI) {
             error -= 2 * Math.PI;
         }
@@ -299,7 +299,7 @@ public class TrackingSS {
     }
 
     //todo ****************** SHOOTER INTERPOLATION *******************
-    public void interpolate() {
+    public static void interpolate() {
         setDxAndDy();
 
         rangeVal = Math.hypot(dx, dy);
@@ -366,6 +366,29 @@ public class TrackingSS {
         return targetHoodPollen;
     }
 
+    public boolean trackingEnabled(ShooterSS shooterSS) {
+        return shooterSS.getPollenTurretState() == ShooterSS.TurretState.TRACKING_ENABLED;
+    }
+
+    public void togglePollenTracking(ShooterSS shooterSS) {
+        if (trackingEnabled(shooterSS)) {
+            shooterSS.updatePollenState(ShooterSS.TurretState.SHOOT);
+        }
+        else {
+            shooterSS.setPollenTurretTarget(getPollenTurretPos());
+            shooterSS.updatePollenState(ShooterSS.TurretState.TRACKING_ENABLED);
+        }
+    }
+
+    public void updatePollenTurretTracking(ShooterSS shooterSS) {
+        if (trackingEnabled(shooterSS)) {
+            shooterSS.setPollenTurretTarget(getPollenTurretPos());
+        }
+        else {
+            setDxAndDy();
+        }
+    }
+
     public void updatePollenTracking(ShooterSS shooterSS) {
         currentPollen = robot.turret1.getPosition();
 
@@ -377,7 +400,7 @@ public class TrackingSS {
         shooterSS.setPollenHoodTarget(getTargetHoodPollen());
     }
 
-    public void updateTracking(ShooterSS shooterSS) {
+    public static void updateTracking(ShooterSS shooterSS) {
         currentPollen = robot.turret1.getPosition();
         currentNectar = robot.turret2.getPosition();
 

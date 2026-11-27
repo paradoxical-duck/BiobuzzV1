@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.Globals;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
@@ -26,6 +27,96 @@ public class ShooterSS {
 
     public void setAutoS3Up(boolean up) {
         autoS3Up = up;
+    }
+
+    //TODO BALL COLORS
+    public enum ShootingMode {INIT, SHOOTING, FINAL_SHOT, RELOCK}
+    private ShootingMode shootingMode = ShootingMode.INIT;
+
+    private final ElapsedTime finishTimer = new ElapsedTime();
+    public static double finishDelayMs = 100;
+
+    private final ElapsedTime intakeLockoutTimer = new ElapsedTime();
+    public static double intakeLockoutMs = 250;
+
+    public ShootingMode getShootingMode() {
+        return shootingMode;
+    }
+
+    public boolean isShooting() {
+        return shootingMode == ShootingMode.SHOOTING || shootingMode == ShootingMode.FINAL_SHOT;
+    }
+
+    public boolean shooterEnabled() {
+        return pollenShooterState == ShooterState.ON;
+    }
+
+    public void startShooting(IntakeSS intakeSS) {
+        if (shootingMode != ShootingMode.INIT || intakeSS.getBallCount() == IntakeSS.Count.EMPTY) {
+            return;
+        }
+
+        updatePollenState(ShooterState.ON);
+        updateState(LockState.POLLEN_UNLOCKED);
+        intakeSS.setIntakeMode(IntakeSS.IntakeMode.ON);
+        shootingMode = ShootingMode.SHOOTING;
+    }
+
+    public void updateShooting(IntakeSS intakeSS) {
+        IntakeSS.Count ballCount = intakeSS.getBallCount();
+
+        if (ballCount != IntakeSS.Count.EMPTY && !shooterEnabled() && shootingMode != ShootingMode.RELOCK) {
+            updatePollenState(ShooterState.ON);
+        }
+        else if (ballCount == IntakeSS.Count.EMPTY && shooterEnabled() && !isShooting()) {
+            updatePollenState(ShooterState.INIT);
+        }
+
+        switch (shootingMode) {
+            case INIT:
+                break;
+
+            case SHOOTING:
+                if (ballCount == IntakeSS.Count.EMPTY) {
+                    shootingMode = ShootingMode.FINAL_SHOT;
+                    finishTimer.reset();
+                }
+                break;
+
+            case FINAL_SHOT:
+                if (ballCount != IntakeSS.Count.EMPTY) {
+                    shootingMode = ShootingMode.SHOOTING;
+                }
+                else if (finishTimer.milliseconds() >= finishDelayMs) {
+                    intakeSS.stopIntake();
+                    updateState(LockState.LOCKED);
+                    updatePollenState(ShooterState.INIT);
+
+                    shootingMode = ShootingMode.RELOCK;
+                    intakeLockoutTimer.reset();
+                }
+                break;
+
+            case RELOCK:
+                if (intakeLockoutTimer.milliseconds() >= intakeLockoutMs && getLockState() == LockState.LOCKED) {
+                    shootingMode = ShootingMode.INIT;
+                    intakeSS.setIntakeMode(ballCount == IntakeSS.Count.FOUR ? IntakeSS.IntakeMode.INIT : IntakeSS.IntakeMode.ON);
+                }
+                break;
+        }
+    }
+
+    public void resetShooting(IntakeSS intakeSS) {
+        shootingMode = ShootingMode.INIT;
+
+        finishTimer.reset();
+        intakeLockoutTimer.reset();
+
+        intakeSS.stopIntake();
+        intakeSS.resetBallCount();
+
+        updateState(ShooterState.INIT);
+        updateState(LockState.LOCKED);
     }
 
     //todo******** shooter *********
