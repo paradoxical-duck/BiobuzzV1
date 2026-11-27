@@ -19,6 +19,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSS;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSS;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -218,6 +220,18 @@ public class RobotHardware {
                 pollenBeam.getState() &&
                 nectarBeam.getState() &&
                 midBeam.getState();
+    }
+    public void init(ShooterSS shooterSS, IntakeSS intakeSS) {
+        shooterSS.updateState(ShooterSS.ShooterState.INIT);
+        shooterSS.updateState(ShooterSS.HoodState.SHOOT);
+
+        shooterSS.updateState(ShooterSS.TurretState.INIT);
+
+        shooterSS.updateState(ShooterSS.LockState.LOCKED);
+
+        intakeSS.updateState(IntakeSS.IntakeState.INIT);
+        intakeSS.updateState(IntakeSS.FlowerRampState.INIT);
+
     }
 
 }

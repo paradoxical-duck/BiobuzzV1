@@ -5,7 +5,6 @@ import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.PrintData;
@@ -19,38 +18,34 @@ import org.firstinspires.ftc.teamcode.subsystems.TrackingSS;
 public class ParaTeleS3 extends LinearOpMode {
     IntakeSS intakeSS;
     ShooterSS shooterSS;
+    TrackingSS trackingSS;
     Follower follower;
     RobotHardware robot = RobotHardware.getInstance();
     public static Pose startPose = new Pose(0, 0, 0);
 
-    boolean red = false;
-    boolean shooterEnabled = false;
-    boolean intakeEnabled = false;
-    boolean intakeReversed = false;
-    boolean trackingEnabled = false;
-    boolean shooterPaused = false;
+    RobotHardware.Alliance alliance;
 
     //***edge detection***
     boolean lastFrontBeam = false;
     boolean lastPollenBeam = false;
 
     //TODO COUNT VARIABLE
-    public static int ballCount;
-    int lastBallCount = 0;
+    public enum Count {EMPTY, ONE, TWO, THREE, FOUR}
+    public static Count ballCount = Count.EMPTY;
+    public static Count lastBallCount = Count.EMPTY;
 
     //TODO BALL COLORS
-    boolean isShooting = false;
+    enum ShootingMode {INIT, SHOOTING, FINAL_SHOT, RELOCK}
+    ShootingMode shootingMode = ShootingMode.INIT;
 
-    boolean finishingShot = false;
+    enum IntakeMode {ON, REVERSE, INIT}
+    IntakeMode currentMode = IntakeMode.INIT;
+
     ElapsedTime finishTimer = new ElapsedTime();
     public static double finishDelayMs = 100;
 
-    void resetGamepads() {
-        robot.currentGamepad1.copy(gamepad1);
-        robot.previousGamepad1.copy(gamepad1);
-        robot.currentGamepad2.copy(gamepad2);
-        robot.previousGamepad2.copy(gamepad2);
-    }
+    ElapsedTime intakeLockoutTimer = new ElapsedTime();
+    public static double intakeLockoutMs = 250;
 
     @Override
     public void runOpMode() {
@@ -59,17 +54,15 @@ public class ParaTeleS3 extends LinearOpMode {
         resetGamepads();
         PrintData.reset();
 
-        red = RobotHardware.isRed();
-        shooterEnabled = false;
-        intakeEnabled = false;
-        intakeReversed = false;
-        trackingEnabled = false;
-        shooterPaused = false;
-        isShooting = false;
-        finishingShot = false;
+        alliance = RobotHardware.getAlliance();
+        shootingMode = ShootingMode.INIT;
+        currentMode = IntakeMode.INIT;
+
         lastFrontBeam = false;
         lastPollenBeam = false;
+
         finishTimer.reset();
+        intakeLockoutTimer.reset();
 
         //***subsystems***
         intakeSS = new IntakeSS(robot);
@@ -79,52 +72,38 @@ public class ParaTeleS3 extends LinearOpMode {
         startPose = RobotHardware.currentPose != null ? RobotHardware.currentPose : new Pose(0, 0, 0); //todo set pose after auto
         follower.setPose(startPose);
 
-        shooterSS.updateState(ShooterSS.ShooterState.INIT);
-        shooterSS.updateState(ShooterSS.HoodState.SHOOT);
-        shooterSS.updateState(ShooterSS.TurretState.SHOOT);
-        shooterSS.updateState(ShooterSS.LockState.LOCKED);
-        intakeSS.updateState(IntakeSS.IntakeState.INIT);
-        intakeSS.updateState(IntakeSS.FlowerRampState.INIT);
+        robot.init(shooterSS, intakeSS);
 
-        robot.turret1.setPosition(0.5);
-        robot.turret2.setPosition(0.5);
-
-        ballCount = 0;
-        lastBallCount = 0;
+        ballCount = Count.EMPTY;
+        lastBallCount = Count.EMPTY;
 
         while (opModeInInit()) {
             robot.readGamepads(gamepad1, gamepad2);
 
-            red = RobotHardware.isRed();
+            alliance = RobotHardware.getAlliance();
+
             //alliance selection carried over from auto but can still be manually changed
             if (robot.currentGamepad1.left_bumper && !robot.previousGamepad1.left_bumper) {
-                red = !red;
+                alliance = alliance == RobotHardware.Alliance.RED ? RobotHardware.Alliance.BLUE : RobotHardware.Alliance.RED;
             }
 
             //since red = RobotHardware.isRed() it is carried over from auto by default, however can be manually changed
-            if (red) {
-                RobotHardware.setAlliance(RobotHardware.Alliance.RED);
-            }
-            else {
-                RobotHardware.setAlliance(RobotHardware.Alliance.BLUE);
-            }
+            RobotHardware.setAlliance(alliance);
 
             if (robot.currentGamepad1.a && !robot.previousGamepad1.a) {
                 startPose = new Pose(0, 0, startPose.heading());
-                follower.setPose(startPose);
             }
             else if (robot.currentGamepad1.b && !robot.previousGamepad1.b) {
                 startPose = new Pose(141.5, 0, startPose.heading());
-                follower.setPose(startPose);
             }
             else if (robot.currentGamepad1.x && !robot.previousGamepad1.x) {
                 startPose = new Pose(0, 141.5, startPose.heading());
-                follower.setPose(startPose);
             }
             else if (robot.currentGamepad1.y && !robot.previousGamepad1.y) {
                 startPose = new Pose(141.5, 141.5, startPose.heading());
-                follower.setPose(startPose);
             }
+
+            follower.setPose(startPose);
 
             telemetry.addLine("Initialized");
             telemetry.addLine(RobotHardware.getAlliance() + " alliance active");
@@ -141,7 +120,7 @@ public class ParaTeleS3 extends LinearOpMode {
             telemetry.update();
         }
 
-        new TrackingSS(robot, follower, RobotHardware.getAlliance());
+        trackingSS = new TrackingSS(robot, follower, alliance);
 
         waitForStart();
         resetGamepads();
@@ -151,7 +130,7 @@ public class ParaTeleS3 extends LinearOpMode {
         lastPollenBeam = robot.pollenBeam.getState();
 
         if (!lastFrontBeam) {
-            ballCount = 1;
+            ballCount = Count.ONE;
         }
 
         lastBallCount = ballCount;
@@ -161,171 +140,127 @@ public class ParaTeleS3 extends LinearOpMode {
             robot.update();
             robot.readGamepads(gamepad1, gamepad2);
 
-            Gamepad gamepad1 = robot.currentGamepad1;
-            Gamepad gamepad2 = robot.currentGamepad2;
-            Gamepad previousGamepad1 = robot.previousGamepad1;
-            Gamepad previousGamepad2 = robot.previousGamepad2;
-
-            follower.manual(ManualDrive.fieldCentric(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
-                    follower.pose().heading()
-            ));
+            follower.manual(ManualDrive.fieldCentric(-robot.currentGamepad1.left_stick_y, -robot.currentGamepad1.left_stick_x, -robot.currentGamepad1.right_stick_x, follower.pose().heading()));
             follower.update();
 
-            if (gamepad2.a && !previousGamepad2.a) {
-                follower.setPose(new Pose(red ? 0 : 141.5, 0, follower.pose().heading()));
-                TrackingSS.resetHiveSelection();
+            if (robot.currentGamepad2.a && !robot.previousGamepad2.a) {
+                follower.setPose(new Pose(alliance == RobotHardware.Alliance.RED ? 0 : 141.5, 0, follower.pose().heading()));
+                trackingSS.resetSelectedHive();
             }
 
-            if (gamepad2.b && !previousGamepad2.b) {
-                follower.setPose(new Pose(red ? 0 : 141.5, 141.5, follower.pose().heading()));
-                TrackingSS.resetHiveSelection();
+            if (robot.currentGamepad2.b && !robot.previousGamepad2.b) {
+                follower.setPose(new Pose(alliance == RobotHardware.Alliance.RED ? 0 : 141.5, 141.5, follower.pose().heading()));
+                trackingSS.resetSelectedHive();
             }
 
-            TrackingSS.setDxAndDy();
+            trackingSS.setDxAndDy();
 
-            if (gamepad2.back && !previousGamepad2.back) {
-                TrackingSS.toggleHive();
+            if (robot.currentGamepad2.back && !robot.previousGamepad2.back) {
+                trackingSS.toggleSelectedHive();
             }
 
-            if (gamepad2.start && !previousGamepad2.start) {
-                trackingEnabled = !trackingEnabled;
-
-                if (trackingEnabled) {
-                    shooterSS.setPollenTurretTarget(TrackingSS.getPollenTurretPos());
-                    shooterSS.updatePollenState(ShooterSS.TurretState.TRACKING_ENABLED);
-                }
-                else {
+            if (robot.currentGamepad2.start && !robot.previousGamepad2.start) {
+                if (trackingEnabled()) {
                     shooterSS.updatePollenState(ShooterSS.TurretState.SHOOT);
                 }
-            }
-
-            if (trackingEnabled) {
-                shooterSS.setPollenTurretTarget(TrackingSS.getPollenTurretPos());
-            }
-
-            //todo intake logic
-            if (!isShooting && gamepad1.right_bumper && !previousGamepad1.right_bumper) {
-                intakeEnabled = !intakeEnabled || intakeReversed;
-                intakeReversed = false;
-
-                if (intakeEnabled && ballCount < 4) {
-                    intakeSS.updateState(IntakeSS.IntakeState.ON);
-                }
                 else {
-                    intakeEnabled = false;
-                    intakeSS.updateState(IntakeSS.IntakeState.INIT);
+                    shooterSS.setPollenTurretTarget(trackingSS.getPollenTurretPos());
+                    shooterSS.updatePollenState(ShooterSS.TurretState.TRACKING_ENABLED);
                 }
             }
 
-            if (!isShooting && gamepad1.x && !previousGamepad1.x) {
-                intakeReversed = !intakeReversed;
-                intakeEnabled = intakeReversed;
-
-                if (intakeReversed) {
-                    intakeSS.updateState(IntakeSS.IntakeState.REVERSE);
-                }
-                else {
-                    intakeSS.updateState(IntakeSS.IntakeState.INIT);
-                }
+            if (trackingEnabled()) {
+                shooterSS.setPollenTurretTarget(trackingSS.getPollenTurretPos());
             }
 
             //todo intake beambreaker logic
-            boolean frontBeam = robot.frontBeam.getState();
-            boolean pollenBeam = robot.pollenBeam.getState();
 
-            if (!frontBeam && lastFrontBeam && ballCount < 4) {
-                ballCount++;
-                shooterPaused = false;
+            if (!robot.frontBeam.getState() && lastFrontBeam) {
+                increaseCount(ballCount);
             }
 
             /* if front beam not tripped, then lastFrontbeam = true, else if front beam tripped, then last front beam = false
              * so if front beam wasn't tripped and front beam is now tripped, ball count increases by one
              */
 
-            if (isShooting && pollenBeam && !lastPollenBeam && ballCount > 0) {
-                ballCount--;
+            if (isShooting() && robot.pollenBeam.getState() && !lastPollenBeam) {
+                decreaseCount(ballCount);
             }
 
-            lastFrontBeam = frontBeam;
-            lastPollenBeam = pollenBeam;
+            lastFrontBeam = robot.frontBeam.getState();
+            lastPollenBeam = robot.pollenBeam.getState();
 
-            if (ballCount == 4 && lastBallCount < 4) {
-                this.gamepad1.rumble(250);
+            if (ballCount == Count.FOUR && lastBallCount != Count.FOUR) {
+                this.gamepad1.rumble(500);
             }
 
             lastBallCount = ballCount;
 
-            if (intakeEnabled && !intakeReversed && !isShooting) {
-                IntakeSS.IntakeState targetState;
-
-                if (ballCount == 4) {
-                    targetState = IntakeSS.IntakeState.INIT;
-                }
-                else if (ballCount >= 2) {
-                    targetState = IntakeSS.IntakeState.POINT_FIVE;
-                }
-                else {
-                    targetState = IntakeSS.IntakeState.ON;
-                }
-
-                if (intakeSS.getIntakeState() != targetState) {
-                    intakeSS.updateState(targetState);
-                }
-            }
-
-            if (ballCount >= 1 && !shooterEnabled && !shooterPaused) {
-                shooterEnabled = true;
+            if (ballCount != Count.EMPTY && !shooterEnabled() && shootingMode != ShootingMode.RELOCK) {
                 shooterSS.updatePollenState(ShooterSS.ShooterState.ON);
             }
-            else if (ballCount == 0 && shooterEnabled && !isShooting) {
-                shooterEnabled = false;
+            else if (ballCount == Count.EMPTY && shooterEnabled() && !isShooting()) {
                 shooterSS.updatePollenState(ShooterSS.ShooterState.INIT);
             }
 
-            if (gamepad1.left_bumper && !previousGamepad1.left_bumper && ballCount > 0 && !isShooting) {
-                shooterPaused = false;
+            if (robot.currentGamepad1.left_bumper && !robot.previousGamepad1.left_bumper
+                    && ballCount != Count.EMPTY && shootingMode == ShootingMode.INIT) {
 
-                if (!shooterEnabled) {
-                    shooterEnabled = true;
-                    shooterSS.updatePollenState(ShooterSS.ShooterState.ON);
-                }
-
+                shooterSS.updatePollenState(ShooterSS.ShooterState.ON);
                 shooterSS.updateState(ShooterSS.LockState.POLLEN_UNLOCKED);
-                intakeSS.updateState(IntakeSS.IntakeState.ON);
-                intakeReversed = false;
-                isShooting = true;
-                finishingShot = false;
+
+                currentMode = IntakeMode.ON;
+                shootingMode = ShootingMode.SHOOTING;
             }
 
-            if (isShooting) {
-                if (ballCount == 0) {
-                    if (!finishingShot) {
-                        finishingShot = true;
+            //todo intake logic
+            if (shootingMode != ShootingMode.RELOCK && (ballCount != Count.FOUR || isShooting())) {
+                if (robot.currentGamepad1.right_bumper && !robot.previousGamepad1.right_bumper) {
+                    currentMode = currentMode == IntakeMode.ON ? IntakeMode.INIT : IntakeMode.ON;
+                }
+
+                if (robot.currentGamepad1.x && !robot.previousGamepad1.x) {
+                    currentMode = currentMode == IntakeMode.REVERSE ? IntakeMode.INIT : IntakeMode.REVERSE;
+                }
+            }
+
+            switch (shootingMode) {
+                case INIT:
+                    break;
+
+                case SHOOTING:
+                    if (ballCount == Count.EMPTY) {
+                        shootingMode = ShootingMode.FINAL_SHOT;
                         finishTimer.reset();
                     }
+                    break;
 
-                    if (finishTimer.milliseconds() >= finishDelayMs) {
+                case FINAL_SHOT:
+                    if (ballCount != Count.EMPTY) {
+                        shootingMode = ShootingMode.SHOOTING;
+                    }
+                    else if (finishTimer.milliseconds() >= finishDelayMs) {
+                        currentMode = IntakeMode.INIT;
+                        intakeSS.updateState(IntakeSS.IntakeState.INIT);
+
                         shooterSS.updateState(ShooterSS.LockState.LOCKED);
                         shooterSS.updatePollenState(ShooterSS.ShooterState.INIT);
 
-                        isShooting = false;
-                        finishingShot = false;
-                        shooterEnabled = false;
-
-                        intakeSS.updateState(intakeEnabled ? IntakeSS.IntakeState.ON : IntakeSS.IntakeState.INIT);
-
-                        lastFrontBeam = robot.frontBeam.getState();
+                        shootingMode = ShootingMode.RELOCK;
+                        intakeLockoutTimer.reset();
                     }
-                }
-                else {
-                    finishingShot = false;
-                }
+                    break;
+
+                case RELOCK:
+                    if (intakeLockoutTimer.milliseconds() >= intakeLockoutMs
+                            && shooterSS.getLockState() == ShooterSS.LockState.LOCKED) {
+                        shootingMode = ShootingMode.INIT;
+                        currentMode = ballCount != Count.FOUR ? IntakeMode.ON : IntakeMode.INIT;
+                    }
+                    break;
             }
 
-            if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
+            if (robot.currentGamepad1.dpad_up && !robot.previousGamepad1.dpad_up) {
                 if (intakeSS.getFlowerRampState() != IntakeSS.FlowerRampState.DEPLOYED) {
                     intakeSS.updateState(IntakeSS.FlowerRampState.DEPLOYED);
                 }
@@ -334,22 +269,58 @@ public class ParaTeleS3 extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.back && !previousGamepad1.back) {
-                intakeEnabled = false;
-                intakeReversed = false;
-                shooterEnabled = false;
-                shooterPaused = true;
-                isShooting = false;
-                finishingShot = false;
+            if (robot.currentGamepad1.back && !robot.previousGamepad1.back) {
+                shootingMode = ShootingMode.INIT;
+                currentMode = IntakeMode.INIT;
+
+                ballCount = Count.EMPTY;
+                lastBallCount = Count.EMPTY;
 
                 finishTimer.reset();
+                intakeLockoutTimer.reset();
+
+                lastFrontBeam = robot.frontBeam.getState();
+                lastPollenBeam = robot.pollenBeam.getState();
 
                 intakeSS.updateState(IntakeSS.IntakeState.INIT);
                 shooterSS.updateState(ShooterSS.ShooterState.INIT);
                 shooterSS.updateState(ShooterSS.LockState.LOCKED);
             }
 
-            PrintData.print(robot, follower, intakeSS, shooterSS, null, trackingEnabled, shooterEnabled, ballCount, telemetry);
+            IntakeSS.IntakeState targetState;
+
+            if (shootingMode == ShootingMode.RELOCK || (ballCount == Count.FOUR && !isShooting())) {
+                currentMode = IntakeMode.INIT;
+                targetState = IntakeSS.IntakeState.INIT;
+            }
+            else {
+                switch (currentMode) {
+                    case ON:
+                        targetState = isShooting() || ballCount == Count.EMPTY || ballCount == Count.ONE
+                                ? IntakeSS.IntakeState.ON
+                                : IntakeSS.IntakeState.POINT_FIVE;
+                        break;
+
+                    case REVERSE:
+                        targetState = IntakeSS.IntakeState.REVERSE;
+                        break;
+
+                    case INIT:
+                    default:
+                        targetState = IntakeSS.IntakeState.INIT;
+                        break;
+                }
+            }
+
+            if (intakeSS.getIntakeState() != targetState) {
+                intakeSS.updateState(targetState);
+            }
+
+            PrintData.print(robot, follower, intakeSS, shooterSS, null, trackingEnabled(), shooterEnabled(),
+                    ballCount == Count.EMPTY ? 0 :
+                            ballCount == Count.ONE ? 1 :
+                            ballCount == Count.TWO ? 2 :
+                            ballCount == Count.THREE ? 3 : 4, telemetry);
 
             telemetry.update();
         }
@@ -357,6 +328,61 @@ public class ParaTeleS3 extends LinearOpMode {
         shooterSS.updateState(ShooterSS.ShooterState.INIT);
         shooterSS.updateState(ShooterSS.LockState.LOCKED);
         intakeSS.updateState(IntakeSS.IntakeState.INIT);
-        TrackingSS.resetHiveSelection();
+        trackingSS.resetSelectedHive();
+    }
+
+    public boolean isShooting() {
+        return shootingMode == ShootingMode.SHOOTING || shootingMode == ShootingMode.FINAL_SHOT;
+    }
+
+    public boolean trackingEnabled() {
+        return shooterSS.getPollenTurretState() == ShooterSS.TurretState.TRACKING_ENABLED;
+    }
+
+    public boolean shooterEnabled() {
+        return shooterSS.getPollenShooterState() == ShooterSS.ShooterState.ON;
+    }
+
+    public void resetGamepads() {
+        robot.currentGamepad1.copy(gamepad1);
+        robot.previousGamepad1.copy(gamepad1);
+        robot.currentGamepad2.copy(gamepad2);
+        robot.previousGamepad2.copy(gamepad2);
+    }
+    public void increaseCount(Count count) {
+        switch (count) {
+            case EMPTY:
+                ballCount = Count.ONE;
+                break;
+            case ONE:
+                ballCount = Count.TWO;
+                break;
+            case TWO:
+                ballCount = Count.THREE;
+                break;
+            case THREE:
+                ballCount = Count.FOUR;
+                break;
+            case FOUR:
+                break;
+        }
+    }
+    public void decreaseCount(Count count) {
+        switch (count) {
+            case FOUR:
+                ballCount = Count.THREE;
+                break;
+            case THREE:
+                ballCount = Count.TWO;
+                break;
+            case TWO:
+                ballCount = Count.ONE;
+                break;
+            case ONE:
+                ballCount = Count.EMPTY;
+                break;
+            case EMPTY:
+                break;
+        }
     }
 }

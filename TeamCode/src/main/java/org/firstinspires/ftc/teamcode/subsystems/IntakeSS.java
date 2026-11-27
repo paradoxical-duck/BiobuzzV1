@@ -10,6 +10,7 @@ public class IntakeSS {
     }
     public enum IntakeState {ON, INIT, REVERSE, FEED, POINT_FIVE}
     public IntakeState intakeState = IntakeState.INIT;
+    public enum IntakeMode {ON, REVERSE, INIT}
     public void updateState(IntakeState newState) {
         double target1 = 0;
         double target2 = 0;

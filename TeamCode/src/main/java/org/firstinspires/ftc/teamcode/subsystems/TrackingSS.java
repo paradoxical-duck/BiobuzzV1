@@ -80,23 +80,23 @@ public class TrackingSS {
         TrackingSS.alliance = alliance;
         currentPollen = robot.turret1.getPosition();
         currentNectar = robot.turret2.getPosition();
-        resetHiveSelection();
+        resetSelectedHive();
     }
 
     public TrackingSS(Follower follower, boolean red) {
         TrackingSS.follower = follower;
         TrackingSS.alliance = red ? RobotHardware.Alliance.RED : RobotHardware.Alliance.BLUE;
-        resetHiveSelection();
+        resetSelectedHive();
     }
 
-    public static void resetHiveSelection() {
+    public void resetSelectedHive() {
         overrideHive = false;
         lastUpperHalf = follower.pose().y() > 70.75;
         overrideUpperHive = lastUpperHalf;
         setDxAndDy();
     }
 
-    public static void toggleHive() {
+    public void toggleSelectedHive() {
         setDxAndDy();
 
         overrideUpperHive = !upperHive;
@@ -105,7 +105,7 @@ public class TrackingSS {
         setDxAndDy();
     }
 
-    public static void setDxAndDy() {
+    public void setDxAndDy() {
         double robotX = follower.pose().x();
         double robotY = follower.pose().y();
 
@@ -138,7 +138,7 @@ public class TrackingSS {
         dy = goalY - robotY;
     }
 
-    public static double getReachableTurretAngle(double requested, double minAngle, double maxAngle) {
+    public double getReachableTurretAngle(double requested, double minAngle, double maxAngle) {
         for (int i = -2; i <= 2; i++) {
             double candidate = requested + 360 * i;
 
@@ -166,7 +166,7 @@ public class TrackingSS {
     }
 
     //todo ****************** TURRET TRACKING *******************
-    public static double getPollenTurretPos() {
+    public double getPollenTurretPos() {
         setDxAndDy();
 
         targetHeading = Math.toDegrees(Math.atan2(dy, dx));
@@ -212,7 +212,7 @@ public class TrackingSS {
         return currentPollen;
     }
 
-    public static double getNectarTurretPos() {
+    public double getNectarTurretPos() {
         setDxAndDy();
 
         double heading = Math.toDegrees(Math.atan2(dy, dx));
@@ -256,11 +256,11 @@ public class TrackingSS {
         return currentNectar;
     }
 
-    public static double getTurretPos() {
+    public double getTurretPos() {
         return getPollenTurretPos();
     }
 
-    public static double getPollenTurret() {
+    public double getPollenTurret() {
         return map(
                 currentPollen,
                 turretLeftPollen,
@@ -270,7 +270,7 @@ public class TrackingSS {
         );
     }
 
-    public static double getNectarTurret() {
+    public double getNectarTurret() {
         return map(
                 currentNectar,
                 turretLeftNectar,
@@ -280,15 +280,15 @@ public class TrackingSS {
         );
     }
 
-    public static double getTurret() {
+    public double getTurret() {
         return getPollenTurret();
     }
 
-    public static double map(double val, double inMin, double inMax, double outMin, double outMax) {
+    public double map(double val, double inMin, double inMax, double outMin, double outMax) {
         return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     }
 
-    public static double angleWrap(double error) {
+    public double angleWrap(double error) {
         while (error > Math.PI) {
             error -= 2 * Math.PI;
         }
@@ -299,7 +299,7 @@ public class TrackingSS {
     }
 
     //todo ****************** SHOOTER INTERPOLATION *******************
-    public static void interpolate() {
+    public void interpolate() {
         setDxAndDy();
 
         rangeVal = Math.hypot(dx, dy);
@@ -366,7 +366,7 @@ public class TrackingSS {
         return targetHoodPollen;
     }
 
-    public static void updatePollenTracking(ShooterSS shooterSS) {
+    public void updatePollenTracking(ShooterSS shooterSS) {
         currentPollen = robot.turret1.getPosition();
 
         shooterSS.setPollenTurretTarget(getPollenTurretPos());
@@ -377,7 +377,7 @@ public class TrackingSS {
         shooterSS.setPollenHoodTarget(getTargetHoodPollen());
     }
 
-    public static void updateTracking(ShooterSS shooterSS) {
+    public void updateTracking(ShooterSS shooterSS) {
         currentPollen = robot.turret1.getPosition();
         currentNectar = robot.turret2.getPosition();
 
