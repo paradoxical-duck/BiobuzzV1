@@ -36,7 +36,7 @@ public class TrackingSS {
     public static double turretMinAngleNectar = -42.9;
     public static double turretMaxAngleNectar = 249.2;
 
-    public static double turretMountOffsetPollen = -3;
+    public static double turretMountOffsetPollen = 0;
     public static double turretMountOffsetNectar = 0;
 
     public static double requestedAnglePollen = 0;

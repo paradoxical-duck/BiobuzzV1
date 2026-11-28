@@ -33,7 +33,7 @@ public class Globals {
     public static Pose blueHiveUpSide = new Pose(84.19, 87.1434);
 
     //todo turret offsets for pollen and nectar
-    public static double turretOffsetPollen = 0.0;
+    public static double turretOffsetPollen = -3.0;
     public static double turretOffsetNectar = 0.0;
 
     //todo flower deploy poses
@@ -44,7 +44,7 @@ public class Globals {
 
     //todo shooter lock poses POLLEN
     public static double feedLock1Open = 0.7;
-    public static double feedLock1Close = 0.61;
+    public static double feedLock1Close = 0.59;
     //todo shooter lock poses NECTAR
     public static double feedLock2Open = 0.5;
     public static double feedLock2Close = 0.5;

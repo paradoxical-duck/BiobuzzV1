@@ -111,6 +111,8 @@ public class RobotHardware {
         intake2 = hardwareMap.get(DcMotorEx.class, "intake2");
         intake1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake1.setDirection(DcMotorSimple.Direction.FORWARD);
         intake2.setDirection(DcMotorSimple.Direction.REVERSE);
 
